@@ -1,4 +1,4 @@
-# chanchreek.dev — portfolio
+# Chanchreek Jain — portfolio
 
 Personal portfolio for **Chanchreek Jain** — AI/ML & Intelligent Automation Engineer.
 
