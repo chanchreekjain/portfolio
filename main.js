@@ -45,6 +45,21 @@
     heroPrism.appendChild(clone);
   }
 
+  /* ───────────────────────────── logo wall ─────────────────────────────
+     Each cell shows a real mark if its file exists in assets/logos/, and
+     falls back to the wordmark when it doesn't. Nothing to configure. */
+  $$('.wall__cell').forEach(function (cell) {
+    var img = cell.querySelector('.wall__logo');
+    if (!img) return;
+    var ok = function () {
+      if (img.naturalWidth > 0) cell.classList.add('has-logo');
+      else img.remove();
+    };
+    var fail = function () { img.remove(); };
+    if (img.complete) { ok(); }
+    else { img.addEventListener('load', ok); img.addEventListener('error', fail); }
+  });
+
   /* ───────────────────────────── loader ───────────────────────────── */
   var loader   = $('#loader');
   var beamFill = $('#beamFill');

@@ -142,8 +142,8 @@ button{ font:inherit; color:inherit; background:none; border:0; cursor:pointer; 
 /* vignette so the flat ground never looks like a dead screen */
 body::after{
   content:"";
-  position:fixed; inset:0; z-index:60; pointer-events:none;
-  background:radial-gradient(135% 110% at 50% 42%, transparent 58%, rgba(0,0,0,.34) 100%);
+  position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background:radial-gradient(140% 118% at 50% 42%, transparent 66%, rgba(0,0,0,.30) 100%);
   opacity:1;
   transition:opacity .6s var(--ease);
 }
@@ -490,7 +490,7 @@ html.is-bone body::after{ opacity:0; }
 .hero__name{
   font-family:var(--display);
   font-weight:400;
-  font-size:clamp(52px,13.2vw,220px);
+  font-size:clamp(40px,11.6vw,196px);
   line-height:.90;
   letter-spacing:-.03em;
   text-transform:uppercase;
@@ -652,39 +652,84 @@ html.is-bone body::after{ opacity:0; }
 .stack__row p{ font-size:14.5px; color:var(--paper-80); letter-spacing:.01em; }
 
 /* ═══════════════════════════════════════════════════════════════
-   Marquee
+   Logo wall
+   Each cell shows the company mark when its file is present in
+   assets/logos/, and a typographic wordmark when it isn't.
    ═══════════════════════════════════════════════════════════════ */
 
-.marquee-wrap{
+.wall-wrap{
   position:relative;
-  padding:clamp(46px,7vh,84px) 0;
+  padding:clamp(52px,8vh,96px) var(--pad);
   border-top:1px solid var(--line);
   border-bottom:1px solid var(--line);
-  overflow:hidden;
 }
-.marquee-wrap__tag{ padding:0 var(--pad); margin-bottom:26px; }
-.marquee{ overflow:hidden; }
-.marquee__track{
-  display:flex; align-items:center; gap:clamp(24px,4vw,58px);
-  width:max-content;
-  animation:slide 42s linear infinite;
+.wall-wrap__tag{ margin-bottom:clamp(26px,4vh,44px); display:flex; align-items:center; gap:12px; }
+.wall-wrap__tag::before{
+  content:""; width:38px; height:1px; flex:0 0 auto; background:var(--spectrum);
 }
-.marquee__track span{
+
+.wall{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  border-top:1px solid var(--line);
+  border-left:1px solid var(--line);
+}
+.wall__cell{
+  position:relative;
+  margin:0;
+  min-height:clamp(118px,15vh,168px);
+  padding:clamp(20px,2.4vw,32px);
+  border-right:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+  display:flex; flex-direction:column; justify-content:center; gap:10px;
+  transition:background .55s var(--ease);
+}
+.wall__cell::before{
+  content:""; position:absolute; left:0; right:0; top:-1px; height:1px;
+  background:var(--champagne); transform:scaleX(0); transform-origin:left;
+  transition:transform .7s var(--ease-out);
+}
+.wall__cell:hover{ background:rgba(237,234,228,.025); }
+html.is-bone .wall__cell:hover{ background:rgba(23,23,15,.028); }
+.wall__cell:hover::before{ transform:scaleX(1); }
+
+/* the mark, when a file exists — flattened to the page's own ink */
+.wall__logo{
+  display:none;
+  width:auto; max-width:min(100%,150px); height:clamp(26px,3.2vw,38px);
+  object-fit:contain; object-position:left center;
+  opacity:.72;
+  filter:grayscale(1) brightness(0) invert(1);
+  transition:opacity .5s var(--ease);
+}
+html.is-bone .wall__logo{ filter:grayscale(1) brightness(0); opacity:.78; }
+.wall__cell.has-logo .wall__logo{ display:block; }
+.wall__cell.has-logo .wall__word{ display:none; }
+.wall__cell:hover .wall__logo{ opacity:1; }
+
+/* the fallback wordmark */
+.wall__word{
   font-family:var(--display);
-  font-size:clamp(28px,5vw,68px);
-  letter-spacing:-.01em;
-  color:rgba(237,234,228,.30);
-  white-space:nowrap;
+  font-weight:560;
+  font-variation-settings:"opsz" 20;
+  font-size:clamp(19px,2vw,27px);
+  line-height:1.1;
+  letter-spacing:-.012em;
+  color:var(--paper-80);
   transition:color .5s var(--ease);
 }
-.marquee__track i{ font-style:normal; font-size:11px; opacity:.75; color:var(--sp-3); }
-.marquee__track i:nth-of-type(5n+1){ color:var(--sp-1); }
-.marquee__track i:nth-of-type(5n+2){ color:var(--sp-3); }
-.marquee__track i:nth-of-type(5n+3){ color:var(--sp-4); }
-.marquee__track i:nth-of-type(5n+4){ color:var(--sp-5); }
-.marquee__track i:nth-of-type(5n+5){ color:var(--sp-7); }
-.marquee:hover .marquee__track span{ color:var(--paper-80); }
-@keyframes slide{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
+.wall__cell:hover .wall__word{ color:var(--paper); }
+
+.wall__role{
+  font-family:var(--mono);
+  font-size:10px; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--paper-38);
+}
+
+@media (max-width:560px){
+  .wall{ grid-template-columns:repeat(2,1fr); }
+  .wall__cell:last-child{ grid-column:1 / -1; }
+}
 
 /* ═══════════════════════════════════════════════════════════════
    Systems — horizontal gallery
@@ -1209,7 +1254,6 @@ html.is-bone body::after{ opacity:0; }
   .expand__sticky{ position:static; height:auto; padding:120px 0; }
   .expand__panel{ width:100% !important; height:auto !important; padding:clamp(30px,6vw,70px) 0; border-radius:0; border-left:0; border-right:0; }
   .expand__content{ opacity:1 !important; transform:none !important; }
-  .marquee__track{ animation:none; }
   .cursor{ display:none !important; }
   .corner{ opacity:1 !important; transform:none !important; }
 }
@@ -1285,7 +1329,7 @@ body,
 .nav, .menu,
 .cap, .slide, .cred, .entry, .expand__panel,
 .slide__stats li, .stack__row, .cred__plate,
-.section, .marquee-wrap, .contact, .foot, .corner{
+.section, .wall-wrap, .contact, .foot, .corner{
   transition:background-color .7s var(--ease),
              border-color .7s var(--ease),
              color .7s var(--ease);
@@ -1322,7 +1366,7 @@ html.is-bone .nav.is-stuck{ background:rgba(233,227,213,.78); }
 
 /* ── grain: paper on bone, film on ink ── */
 .grain{
-  position:fixed; inset:0; z-index:61;
+  position:fixed; inset:0; z-index:-1;
   pointer-events:none;
   opacity:.055;
   mix-blend-mode:overlay;
@@ -1334,31 +1378,38 @@ html.is-bone .grain{ opacity:.085; mix-blend-mode:multiply; }
 /* ── display: Bodoni wants its optical size set by hand ── */
 .hero__name,
 .hero__prism .hero__name{
-  font-weight:500;
-  font-variation-settings:"opsz" 96;
-  letter-spacing:-.028em;
-  line-height:.92;
+  font-weight:620;
+  font-variation-settings:"opsz" 38;
+  letter-spacing:-.02em;
+  line-height:.94;
+  /* antialiased thins light strokes on dark — let the OS render it normally */
+  -webkit-font-smoothing:auto;
+  -moz-osx-font-smoothing:auto;
 }
+/* each name holds its own line; the letters are separate spans and would
+   otherwise break mid-word */
+.hero__word{ white-space:nowrap; }
 .section__title{
-  font-weight:450;
-  font-variation-settings:"opsz" 72;
-  letter-spacing:-.022em;
+  font-weight:560;
+  font-variation-settings:"opsz" 36;
+  letter-spacing:-.018em;
+  -webkit-font-smoothing:auto;
 }
-.contact__title{ font-weight:450; font-variation-settings:"opsz" 88; letter-spacing:-.03em; }
-.expand__lead{ font-weight:400; font-variation-settings:"opsz" 56; letter-spacing:-.012em; line-height:1.2; }
+.contact__title{ font-weight:600; font-variation-settings:"opsz" 34; letter-spacing:-.024em; -webkit-font-smoothing:auto; }
+.expand__lead{ font-weight:420; font-variation-settings:"opsz" 30; letter-spacing:-.008em; line-height:1.24; }
 .expand__lead em{ font-style:italic; font-weight:450; }
 .gallery__title,
 .slide__title,
 .entry__body h3,
-.cred h3{ font-weight:500; font-variation-settings:"opsz" 30; letter-spacing:-.014em; }
-.menu__list a{ font-weight:450; font-variation-settings:"opsz" 60; letter-spacing:-.02em; }
-.marquee__track span{ font-weight:500; font-variation-settings:"opsz" 48; }
+.cred h3{ font-weight:560; font-variation-settings:"opsz" 20; letter-spacing:-.01em; }
+.menu__list a{ font-weight:560; font-variation-settings:"opsz" 30; letter-spacing:-.016em; }
 .nav__mark-glyph{ font-weight:600; font-variation-settings:"opsz" 14; letter-spacing:.14em; }
 .loader__name{ font-weight:450; font-variation-settings:"opsz" 24; letter-spacing:.2em; }
 .corner{ font-weight:500; font-variation-settings:"opsz" 14; }
-html.is-bone .hero__name,
-html.is-bone .section__title,
-html.is-bone .contact__title{ font-weight:400; }
+/* dark ink on pale paper reads heavier — ease the weight back off */
+html.is-bone .section__title{ font-weight:470; }
+html.is-bone .contact__title{ font-weight:500; }
+html.is-bone .expand__lead{ font-weight:400; }
 
 /* ── wide grotesque for the navigational furniture ── */
 .nav__links a,
@@ -1371,7 +1422,7 @@ html.is-bone .contact__title{ font-weight:400; }
 }
 .hero__eyebrow{ font-family:var(--mono); letter-spacing:.26em; font-weight:400; }
 .entry__body h3 em{ font-family:var(--mono); letter-spacing:.16em; font-size:11px; }
-.cap h3{ font-weight:500; font-variation-settings:"opsz" 24; }
+.cap h3{ font-weight:540; font-variation-settings:"opsz" 18; }
 
 /* ── every figure, ID and readout is mono ── */
 .slide__stats b,
@@ -1409,6 +1460,12 @@ html.is-bone .contact__title{ font-weight:400; }
 
 /* ── the hero refraction ── */
 .hero__type{ position:relative; }
+.hero__type::before{
+  content:"";
+  position:absolute; left:-6%; right:-6%; top:-14%; bottom:-14%;
+  background:radial-gradient(62% 66% at 32% 50%, rgba(10,10,13,.92), rgba(10,10,13,0) 74%);
+  pointer-events:none; z-index:-1;
+}
 .hero__prism{
   position:absolute; inset:0;
   pointer-events:none;

@@ -55,47 +55,191 @@
      then; a clustering filter throws away the blips that aren't animals
      or people; a positive detection banks a 20-second clip.            */
 
+  /* a hand-drawn line: one quadratic with the control point nudged off the
+     chord, so nothing is mechanically straight */
+  function sketch(ctx, x1, y1, x2, y2, bend) {
+    var mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+    var dx = x2 - x1, dy = y2 - y1;
+    var len = Math.sqrt(dx*dx + dy*dy) || 1;
+    ctx.moveTo(x1, y1);
+    ctx.quadraticCurveTo(mx - dy/len * bend, my + dx/len * bend, x2, y2);
+  }
+
+  /* An original stick figure — round head, wobbly limbs, a proper walk
+     cycle, and a startled beat when the model locks on. */
+  function walker(ctx, x, groundY, sc, phase, startle, color, wob) {
+    var bob   = Math.cos(phase * 2) * sc * 0.05 * (1 - startle);
+    var hipY  = groundY - sc * 0.74 + bob;
+    var shY   = groundY - sc * 1.28 + bob;
+    var headY = groundY - sc * 1.56 + bob - startle * sc * 0.06;
+    var headR = sc * 0.17;
+
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = Math.max(sc * 0.055, 1.4);
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    /* head */
+    ctx.beginPath();
+    ctx.arc(x + wob(1) , headY, headR, 0, Math.PI * 2);
+    ctx.stroke();
+
+    /* spine */
+    ctx.beginPath();
+    sketch(ctx, x, headY + headR, x + wob(2), hipY, sc * 0.03);
+    ctx.stroke();
+
+    /* legs — swing, with a knee that bends on the forward stroke */
+    var legSwing = startle > 0.5 ? 0.22 : Math.sin(phase) * 0.55;
+    [legSwing, -legSwing].forEach(function (a, i) {
+      var kneeX = x + Math.sin(a) * sc * 0.38;
+      var kneeY = hipY + Math.cos(a) * sc * 0.38;
+      var bend  = a > 0 ? 0.34 : -0.08;
+      var footX = kneeX + Math.sin(a + bend) * sc * 0.40;
+      var footY = Math.min(kneeY + Math.cos(a + bend) * sc * 0.40, groundY);
+      ctx.beginPath();
+      sketch(ctx, x, hipY, kneeX, kneeY, sc * 0.02 * (i ? 1 : -1));
+      sketch(ctx, kneeX, kneeY, footX, footY, sc * 0.02);
+      ctx.stroke();
+      /* foot */
+      ctx.beginPath();
+      ctx.moveTo(footX - sc * 0.02, footY);
+      ctx.lineTo(footX + sc * 0.13, footY + wob(3 + i));
+      ctx.stroke();
+    });
+
+    /* arms — counter-swing, then straight up when startled */
+    var armSwing = Math.sin(phase + Math.PI) * 0.5;
+    [armSwing, -armSwing].forEach(function (a, i) {
+      var ang = startle > 0 ? lerp(a, (i ? -2.55 : 2.55), startle) : a;
+      var elbX = x + Math.sin(ang) * sc * 0.34;
+      var elbY = shY + Math.cos(ang) * sc * 0.34;
+      var fore = ang + (startle > 0 ? 0 : (i ? 0.24 : -0.18));
+      var hndX = elbX + Math.sin(fore) * sc * 0.32;
+      var hndY = elbY + Math.cos(fore) * sc * 0.32;
+      ctx.beginPath();
+      sketch(ctx, x, shY, elbX, elbY, sc * 0.02 * (i ? -1 : 1));
+      sketch(ctx, elbX, elbY, hndX, hndY, sc * 0.02);
+      ctx.stroke();
+    });
+
+    /* face — two dots, and a mouth that goes round when startled */
+    ctx.fillStyle = color;
+    [-1, 1].forEach(function (sgn) {
+      ctx.beginPath();
+      ctx.arc(x + sgn * headR * 0.36 + wob(5), headY - headR * 0.12,
+              Math.max(sc * 0.022, 1), 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.beginPath();
+    if (startle > 0.4) {
+      ctx.arc(x, headY + headR * 0.34, headR * 0.24, 0, Math.PI * 2);
+    } else {
+      ctx.arc(x, headY + headR * 0.12, headR * 0.42, 0.35 * Math.PI, 0.65 * Math.PI);
+    }
+    ctx.stroke();
+
+    /* the beat: an exclamation pops over the head */
+    if (startle > 0.35) {
+      var ex = x + headR * 1.5, ey = headY - headR * 1.45;
+      ctx.save();
+      ctx.globalAlpha = clamp((startle - 0.35) / 0.35, 0, 1);
+      ctx.lineWidth = Math.max(sc * 0.06, 1.6);
+      ctx.beginPath();
+      ctx.moveTo(ex, ey);
+      ctx.lineTo(ex + sc * 0.02, ey + sc * 0.20);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(ex + sc * 0.03, ey + sc * 0.30, Math.max(sc * 0.028, 1.2), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+
+  /* the blips the clustering filter throws away — small four-legged things */
+  function critter(ctx, x, y, sc, color) {
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = Math.max(sc * 0.07, 1.2);
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    sketch(ctx, x - sc * 0.34, y, x + sc * 0.30, y - sc * 0.05, sc * 0.05);   // back
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(x + sc * 0.40, y - sc * 0.14, sc * 0.13, 0, Math.PI * 2);          // head
+    ctx.stroke();
+    [-0.26, -0.06, 0.10, 0.24].forEach(function (o, i) {
+      ctx.beginPath();
+      sketch(ctx, x + sc * o, y + (i > 1 ? -sc * 0.03 : 0), x + sc * (o - 0.03), y + sc * 0.34, sc * 0.02);
+      ctx.stroke();
+    });
+    ctx.beginPath();
+    sketch(ctx, x - sc * 0.34, y, x - sc * 0.52, y - sc * 0.22, sc * 0.06);    // tail
+    ctx.stroke();
+    ctx.restore();
+  }
+
   var poaching = {
     init: function (s) {
       s.t = 0;
-      s.subject = { x: -0.18, y: 0.60 };
-      s.decoys = [{x:.22,y:.30},{x:.76,y:.24}];
+      s.x = -0.16;          // walker position, 0..1 across the frame
+      s.step = 0;           // walk cycle phase
       s.conf = 0;
       s.clip = 0;
       s.sensor = [];
-      for (var i=0;i<52;i++) s.sensor.push(0.07 + Math.random()*0.06);
+      for (var i = 0; i < 52; i++) s.sensor.push(0.07 + Math.random() * 0.06);
+      s.decoys = [{ x: 0.20, y: 0.42 }, { x: 0.74, y: 0.30 }];
     },
 
     // 0 armed · 1 motion · 2 inference · 3 filter · 4 capture
     phase: function (t) {
-      var c = t % 10.4;
-      if (c < 1.6)  return { i:0, p:c/1.6,        label:'Armed — sensor only' };
-      if (c < 3.0)  return { i:1, p:(c-1.6)/1.4,  label:'Motion — waking' };
-      if (c < 5.4)  return { i:2, p:(c-3.0)/2.4,  label:'YOLOv11 — inference' };
-      if (c < 7.2)  return { i:3, p:(c-5.4)/1.8,  label:'Cluster filter' };
-      return          { i:4, p:(c-7.2)/3.2,       label:'Capture — 20 s clip' };
+      var c = t % 11.2;
+      if (c < 1.6) return { i:0, p:c/1.6,       c:c, label:'Armed — sensor only' };
+      if (c < 3.2) return { i:1, p:(c-1.6)/1.6, c:c, label:'Motion — waking' };
+      if (c < 6.0) return { i:2, p:(c-3.2)/2.8, c:c, label:'YOLOv11 — inference' };
+      if (c < 7.9) return { i:3, p:(c-6.0)/1.9, c:c, label:'Cluster filter' };
+      return         { i:4, p:(c-7.9)/3.3,      c:c, label:'Capture — 20 s clip' };
     },
 
     frame: function (s, dt) {
       var ctx = s.ctx, w = s.w, h = s.h;
       s.t += dt;
       var ph = poaching.phase(s.t);
-      var u = Math.min(w, h);
+      var footer = 46;
+      var fieldH = h - footer;
+      var u = Math.min(w, fieldH);
 
-      ctx.clearRect(0,0,w,h);
-      var g = ctx.createLinearGradient(0,0,0,h);
+      /* the startled beat, held briefly once the brackets lock on */
+      var startle = 0;
+      if (ph.c > 4.7 && ph.c < 6.0) startle = Math.min((ph.c - 4.7) / 0.28, 1) * Math.min((6.0 - ph.c) / 0.4, 1);
+      startle = clamp(startle, 0, 1);
+
+      /* walking */
+      if (ph.i >= 1) {
+        var speed = 0.052 * (1 - startle);
+        s.x += dt * speed;
+        s.step += dt * speed * 78;
+        if (s.x > 1.18) { s.x = -0.16; }
+      }
+
+      var wob = function (k) { return Math.sin(s.t * 5.5 + k * 12.9898) * Math.max(u * 0.004, 0.6); };
+
+      ctx.clearRect(0, 0, w, h);
+      var g = ctx.createLinearGradient(0, 0, 0, h);
       g.addColorStop(0, '#0C0F15'); g.addColorStop(1, '#080A0D');
-      ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
+      ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
 
-      /* terrain — bright enough to read as a place */
+      /* terrain */
       ctx.save();
-      for (var k=0;k<7;k++){
-        ctx.strokeStyle = 'rgba(90,151,186,' + (0.20 - k*0.018).toFixed(3) + ')';
+      for (var k = 0; k < 7; k++) {
+        ctx.strokeStyle = 'rgba(90,151,186,' + (0.19 - k * 0.017).toFixed(3) + ')';
         ctx.lineWidth = 1;
         ctx.beginPath();
-        for (var x=0;x<=w;x+=6){
-          var yy = h*(0.22+k*0.11) + Math.sin(x*0.013 + k*1.7)*8 + Math.sin(x*0.005+k)*13;
-          x===0 ? ctx.moveTo(x,yy) : ctx.lineTo(x,yy);
+        for (var x = 0; x <= w; x += 6) {
+          var yy = fieldH * (0.20 + k * 0.11) + Math.sin(x * 0.013 + k * 1.7) * 8 + Math.sin(x * 0.005 + k) * 12;
+          x === 0 ? ctx.moveTo(x, yy) : ctx.lineTo(x, yy);
         }
         ctx.stroke();
       }
@@ -103,88 +247,84 @@
 
       /* sensor grid */
       ctx.save();
-      ctx.strokeStyle = 'rgba(237,234,228,.045)'; ctx.lineWidth = 1;
-      for (var gx=0; gx<w; gx+=Math.round(u/7)) { ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,h); ctx.stroke(); }
-      for (var gy=0; gy<h; gy+=Math.round(u/7)) { ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(w,gy); ctx.stroke(); }
+      ctx.strokeStyle = 'rgba(237,234,228,.04)'; ctx.lineWidth = 1;
+      for (var gx = 0; gx < w; gx += Math.round(u / 7)) { ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, fieldH); ctx.stroke(); }
+      for (var gy = 0; gy < fieldH; gy += Math.round(u / 7)) { ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(w, gy); ctx.stroke(); }
       ctx.restore();
 
-      /* idle breathing ring — the node is asleep, not dead */
+      var groundY = fieldH * 0.80;
+      var sc = clamp(u * 0.30, 38, 98);
+
+      /* ground line the figure walks on */
+      ctx.strokeStyle = 'rgba(237,234,228,.10)';
+      ctx.beginPath(); ctx.moveTo(0, groundY + 0.5); ctx.lineTo(w, groundY + 0.5); ctx.stroke();
+
+      /* idle: the node is asleep, not dead */
       if (ph.i === 0) {
-        var pulse = (Math.sin(s.t*2.2)+1)/2;
-        ctx.save();
-        ctx.strokeStyle = 'rgba(203,179,146,' + (0.10 + pulse*0.16).toFixed(3) + ')';
+        var pulse = (Math.sin(s.t * 2.2) + 1) / 2;
+        ctx.strokeStyle = 'rgba(203,179,146,' + (0.10 + pulse * 0.16).toFixed(3) + ')';
         ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.arc(w/2, (h-40)/2, u*0.10 + pulse*u*0.06, 0, Math.PI*2);
+        ctx.arc(w / 2, fieldH / 2, u * 0.10 + pulse * u * 0.06, 0, Math.PI * 2);
         ctx.stroke();
-        ctx.restore();
       }
 
-      /* subject */
-      var moving = ph.i >= 1;
-      if (moving) s.subject.x += dt * 0.055;
-      if (s.subject.x > 1.2) s.subject.x = -0.18;
-      var sx = s.subject.x * w, sy = s.subject.y * (h-46);
-      var R = u*0.11;
-
-      if (ph.i >= 1) {
-        var blob = ctx.createRadialGradient(sx, sy, 1, sx, sy, R);
-        blob.addColorStop(0,  'rgba(240,196,120,.95)');
-        blob.addColorStop(.35,'rgba(215,146,74,.55)');
-        blob.addColorStop(.7, 'rgba(210,104,94,.22)');
-        blob.addColorStop(1,  'rgba(210,104,94,0)');
-        ctx.fillStyle = blob;
-        ctx.beginPath(); ctx.arc(sx, sy, R, 0, Math.PI*2); ctx.fill();
-      }
+      var sx = s.x * w;
 
       /* inference sweep */
       if (ph.i === 2) {
-        var sweepY = ph.p * h;
-        var sg = ctx.createLinearGradient(0, sweepY-30, 0, sweepY+4);
-        sg.addColorStop(0,'rgba(107,162,107,0)');
-        sg.addColorStop(1,'rgba(107,162,107,.28)');
-        ctx.fillStyle = sg; ctx.fillRect(0, sweepY-30, w, 34);
+        var sweepY = ph.p * fieldH;
+        var sg = ctx.createLinearGradient(0, sweepY - 32, 0, sweepY + 4);
+        sg.addColorStop(0, 'rgba(107,162,107,0)');
+        sg.addColorStop(1, 'rgba(107,162,107,.26)');
+        ctx.fillStyle = sg; ctx.fillRect(0, sweepY - 32, w, 36);
         ctx.fillStyle = 'rgba(107,162,107,.7)'; ctx.fillRect(0, sweepY, w, 1);
+      }
+
+      /* the walker */
+      if (ph.i >= 1) {
+        walker(ctx, sx, groundY, sc, s.step, startle, 'rgba(240,232,214,.95)', wob);
       }
 
       /* detection brackets */
       if (ph.i >= 2) {
-        var grow = ph.i === 2 ? easeOut(clamp(ph.p*1.7,0,1)) : 1;
-        var bw = lerp(R*3.2, R*1.9, grow), bh = lerp(R*3.8, R*2.4, grow);
-        var alpha = ph.i === 2 ? clamp(ph.p*3.2,0,1) : 1;
-        var x0 = sx-bw/2, y0 = sy-bh/2, arm = Math.max(bw*0.24, 9);
+        var grow = ph.i === 2 ? easeOut(clamp(ph.p * 1.8, 0, 1)) : 1;
+        var bw = lerp(sc * 1.95, sc * 1.38, grow);
+        var bh = lerp(sc * 2.40, sc * 1.96, grow);
+        var alpha = ph.i === 2 ? clamp(ph.p * 3.4, 0, 1) : 1;
+        var x0 = sx - bw / 2, y0 = groundY - bh - sc * 0.02, arm = Math.max(bw * 0.26, 9);
         ctx.save();
         ctx.globalAlpha = alpha;
         ctx.strokeStyle = SPECTRUM.green; ctx.lineWidth = 1.6;
-        [[x0,y0,1,1],[x0+bw,y0,-1,1],[x0,y0+bh,1,-1],[x0+bw,y0+bh,-1,-1]].forEach(function(c){
+        [[x0,y0,1,1],[x0+bw,y0,-1,1],[x0,y0+bh,1,-1],[x0+bw,y0+bh,-1,-1]].forEach(function (c) {
           ctx.beginPath();
-          ctx.moveTo(c[0]+c[2]*arm, c[1]);
+          ctx.moveTo(c[0] + c[2] * arm, c[1]);
           ctx.lineTo(c[0], c[1]);
-          ctx.lineTo(c[0], c[1]+c[3]*arm);
+          ctx.lineTo(c[0], c[1] + c[3] * arm);
           ctx.stroke();
         });
-        s.conf = ph.i === 2 ? lerp(0.41, 0.94, easeOut(clamp(ph.p*1.4,0,1))) : 0.94;
-        label(ctx, 'PERSON ' + (s.conf*100).toFixed(0) + '%', x0, y0-14, 9, SPECTRUM.green);
+        s.conf = ph.i === 2 ? lerp(0.41, 0.94, easeOut(clamp(ph.p * 1.4, 0, 1))) : 0.94;
+        label(ctx, 'PERSON ' + (s.conf * 100).toFixed(0) + '%', x0, y0 - 14, 9, SPECTRUM.green);
         ctx.restore();
       }
 
-      /* discarded blips */
+      /* the filter throwing away what isn't a person */
       if (ph.i === 3) {
-        s.decoys.forEach(function(d, i){
-          var local = clamp(ph.p*2 - i*0.3, 0, 1);
+        s.decoys.forEach(function (d, i) {
+          var local = clamp(ph.p * 2 - i * 0.3, 0, 1);
           if (local <= 0) return;
-          var dx = d.x*w, dy = d.y*(h-46);
+          var dx = d.x * w, dy = d.y * fieldH;
+          var q = Math.max(u * 0.075, 16);
           ctx.save();
-          ctx.globalAlpha = local < .72 ? 1 : 1-(local-.72)/.28;
+          ctx.globalAlpha = local < 0.72 ? 1 : 1 - (local - 0.72) / 0.28;
+          critter(ctx, dx, dy, q, 'rgba(237,234,228,.55)');
           ctx.strokeStyle = 'rgba(210,104,94,.85)'; ctx.lineWidth = 1.2;
-          var q = Math.max(u*0.05, 12);
-          ctx.strokeRect(dx-q, dy-q, q*2, q*2);
-          if (local > .35) {
+          ctx.strokeRect(dx - q * 0.72, dy - q * 0.58, q * 1.5, q * 1.06);
+          if (local > 0.35) {
             ctx.beginPath();
-            ctx.moveTo(dx-q*.6,dy-q*.6); ctx.lineTo(dx+q*.6,dy+q*.6);
-            ctx.moveTo(dx+q*.6,dy-q*.6); ctx.lineTo(dx-q*.6,dy+q*.6);
+            ctx.moveTo(dx - q * 0.5, dy - q * 0.4); ctx.lineTo(dx + q * 0.6, dy + q * 0.4);
             ctx.stroke();
-            label(ctx, 'REJECTED', dx+q+6, dy-5, 8, 'rgba(210,104,94,.9)');
+            label(ctx, 'NOT A PERSON', dx + q * 0.86, dy - 5, 8, 'rgba(210,104,94,.9)');
           }
           ctx.restore();
         });
@@ -193,36 +333,36 @@
       /* sensor trace */
       var by = h - 32, bh2 = 20;
       s.sensor.shift();
-      s.sensor.push(ph.i === 0 ? 0.06 + Math.random()*0.06
-                  : ph.i === 1 ? 0.45 + Math.random()*0.55
-                  : 0.22 + Math.random()*0.34);
-      var step = (w-32)/s.sensor.length;
-      for (var i2=0;i2<s.sensor.length;i2++){
-        var v = s.sensor[i2];
-        ctx.fillStyle = v > .3 ? 'rgba(205,186,91,.85)' : 'rgba(237,234,228,.20)';
-        ctx.fillRect(16 + i2*step, by + bh2 - v*bh2, Math.max(step-1.6,1), Math.max(v*bh2,1));
+      s.sensor.push(ph.i === 0 ? 0.06 + Math.random() * 0.06
+                  : ph.i === 1 ? 0.45 + Math.random() * 0.55
+                  : 0.22 + Math.random() * 0.34);
+      var step = (w - 32) / s.sensor.length;
+      for (var i2 = 0; i2 < s.sensor.length; i2++) {
+        var vv = s.sensor[i2];
+        ctx.fillStyle = vv > 0.3 ? 'rgba(205,186,91,.85)' : 'rgba(237,234,228,.20)';
+        ctx.fillRect(16 + i2 * step, by + bh2 - vv * bh2, Math.max(step - 1.6, 1), Math.max(vv * bh2, 1));
       }
       ctx.strokeStyle = LINE; ctx.beginPath();
-      ctx.moveTo(16, by+bh2+.5); ctx.lineTo(w-16, by+bh2+.5); ctx.stroke();
+      ctx.moveTo(16, by + bh2 + 0.5); ctx.lineTo(w - 16, by + bh2 + 0.5); ctx.stroke();
 
-      label(ctx, ph.label.toUpperCase(), 16, 14, 9, ph.i===0 ? DIM : SPECTRUM.yellow);
+      label(ctx, ph.label.toUpperCase(), 16, 14, 9, ph.i === 0 ? DIM : SPECTRUM.yellow);
 
       if (ph.i === 4) {
         s.clip = clamp(ph.p, 0, 1);
-        var cw = 74, cx0 = w-16-cw;
+        var cw = 74, cx0 = w - 16 - cw;
         ctx.fillStyle = 'rgba(237,234,228,.14)'; ctx.fillRect(cx0, 19, cw, 2);
-        ctx.fillStyle = SPECTRUM.red; ctx.fillRect(cx0, 19, cw*s.clip, 2);
-        label(ctx, (s.clip*20).toFixed(0) + ' / 20 S', cx0, 25, 8, DIM);
-        ctx.beginPath(); ctx.arc(cx0-11, 20, 3.2, 0, Math.PI*2);
-        ctx.fillStyle = (s.t*3|0)%2 ? SPECTRUM.red : 'rgba(210,104,94,.25)';
+        ctx.fillStyle = SPECTRUM.red; ctx.fillRect(cx0, 19, cw * s.clip, 2);
+        label(ctx, (s.clip * 20).toFixed(0) + ' / 20 S', cx0, 25, 8, DIM);
+        ctx.beginPath(); ctx.arc(cx0 - 11, 20, 3.2, 0, Math.PI * 2);
+        ctx.fillStyle = (s.t * 3 | 0) % 2 ? SPECTRUM.red : 'rgba(210,104,94,.25)';
         ctx.fill();
       } else {
         var pw = labelWidth(ctx, 'RASPBERRY PI 3B', 8);
-        label(ctx, 'RASPBERRY PI 3B', w-16-pw, 16, 8, 'rgba(237,234,228,.34)');
+        label(ctx, 'RASPBERRY PI 3B', w - 16 - pw, 16, 8, 'rgba(237,234,228,.34)');
       }
 
       ctx.strokeStyle = LINE; ctx.lineWidth = 1;
-      ctx.strokeRect(.5,.5,w-1,h-1);
+      ctx.strokeRect(0.5, 0.5, w - 1, h - 1);
     }
   };
 
