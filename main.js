@@ -45,19 +45,20 @@
     heroPrism.appendChild(clone);
   }
 
-  /* ───────────────────────────── logo wall ─────────────────────────────
-     Each cell shows a real mark if its file exists in assets/logos/, and
-     falls back to the wordmark when it doesn't. Nothing to configure. */
-  $$('.wall__cell').forEach(function (cell) {
-    var img = cell.querySelector('.wall__logo');
-    if (!img) return;
-    var ok = function () {
-      if (img.naturalWidth > 0) cell.classList.add('has-logo');
-      else img.remove();
-    };
+  /* ───────────────────────────── company marks ─────────────────────────
+     A mark shows when its file is present and the wordmark takes over when
+     it isn't. Never mark these images lazy: they start display:none, and a
+     hidden lazy image is never fetched, so the class that reveals it would
+     never be added. */
+  $$('.entry__logo').forEach(function (img) {
+    var entry = img.closest('.entry');
+    var ok   = function () { img.naturalWidth > 0 ? entry.classList.add('has-logo') : img.remove(); };
     var fail = function () { img.remove(); };
-    if (img.complete) { ok(); }
+    if (img.complete) ok();
     else { img.addEventListener('load', ok); img.addEventListener('error', fail); }
+  });
+  $$('.cred__logo').forEach(function (img) {
+    img.addEventListener('error', function () { img.remove(); });
   });
 
   /* ───────────────────────────── loader ───────────────────────────── */

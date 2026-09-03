@@ -652,86 +652,6 @@ html.is-bone body::after{ opacity:0; }
 .stack__row p{ font-size:14.5px; color:var(--paper-80); letter-spacing:.01em; }
 
 /* ═══════════════════════════════════════════════════════════════
-   Logo wall
-   Each cell shows the company mark when its file is present in
-   assets/logos/, and a typographic wordmark when it isn't.
-   ═══════════════════════════════════════════════════════════════ */
-
-.wall-wrap{
-  position:relative;
-  padding:clamp(52px,8vh,96px) var(--pad);
-  border-top:1px solid var(--line);
-  border-bottom:1px solid var(--line);
-}
-.wall-wrap__tag{ margin-bottom:clamp(26px,4vh,44px); display:flex; align-items:center; gap:12px; }
-.wall-wrap__tag::before{
-  content:""; width:38px; height:1px; flex:0 0 auto; background:var(--spectrum);
-}
-
-.wall{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
-  border-top:1px solid var(--line);
-  border-left:1px solid var(--line);
-}
-.wall__cell{
-  position:relative;
-  margin:0;
-  min-height:clamp(118px,15vh,168px);
-  padding:clamp(20px,2.4vw,32px);
-  border-right:1px solid var(--line);
-  border-bottom:1px solid var(--line);
-  display:flex; flex-direction:column; justify-content:center; gap:10px;
-  transition:background .55s var(--ease);
-}
-.wall__cell::before{
-  content:""; position:absolute; left:0; right:0; top:-1px; height:1px;
-  background:var(--champagne); transform:scaleX(0); transform-origin:left;
-  transition:transform .7s var(--ease-out);
-}
-.wall__cell:hover{ background:rgba(237,234,228,.025); }
-html.is-bone .wall__cell:hover{ background:rgba(23,23,15,.028); }
-.wall__cell:hover::before{ transform:scaleX(1); }
-
-/* the mark, when a file exists — flattened to the page's own ink */
-.wall__logo{
-  display:none;
-  width:auto; max-width:min(100%,150px); height:clamp(26px,3.2vw,38px);
-  object-fit:contain; object-position:left center;
-  opacity:.72;
-  filter:grayscale(1) brightness(0) invert(1);
-  transition:opacity .5s var(--ease);
-}
-html.is-bone .wall__logo{ filter:grayscale(1) brightness(0); opacity:.78; }
-.wall__cell.has-logo .wall__logo{ display:block; }
-.wall__cell.has-logo .wall__word{ display:none; }
-.wall__cell:hover .wall__logo{ opacity:1; }
-
-/* the fallback wordmark */
-.wall__word{
-  font-family:var(--display);
-  font-weight:560;
-  font-variation-settings:"opsz" 20;
-  font-size:clamp(19px,2vw,27px);
-  line-height:1.1;
-  letter-spacing:-.012em;
-  color:var(--paper-80);
-  transition:color .5s var(--ease);
-}
-.wall__cell:hover .wall__word{ color:var(--paper); }
-
-.wall__role{
-  font-family:var(--mono);
-  font-size:10px; letter-spacing:.16em; text-transform:uppercase;
-  color:var(--paper-38);
-}
-
-@media (max-width:560px){
-  .wall{ grid-template-columns:repeat(2,1fr); }
-  .wall__cell:last-child{ grid-column:1 / -1; }
-}
-
-/* ═══════════════════════════════════════════════════════════════
    Systems — horizontal gallery
    ═══════════════════════════════════════════════════════════════ */
 
@@ -898,6 +818,7 @@ html.is-bone .wall__logo{ filter:grayscale(1) brightness(0); opacity:.78; }
   letter-spacing:-.012em;
   margin-bottom:clamp(14px,2vh,22px);
 }
+.entry__head em{ margin-left:0; }
 .slide__desc{
   font-size:clamp(13px,1.05vw,15.5px);
   color:var(--paper-56);
@@ -971,20 +892,32 @@ html.is-bone .wall__logo{ filter:grayscale(1) brightness(0); opacity:.78; }
 }
 .entry:first-child{ border-top:1px solid var(--line); }
 .entry__meta{ display:flex; flex-direction:column; gap:9px; }
-.entry:nth-child(2) .entry__key{ color:var(--sp-3); }
-.entry:nth-child(3) .entry__key{ color:var(--sp-4); }
-.entry:nth-child(4) .entry__key{ color:var(--sp-5); }
-.entry:nth-child(5) .entry__key{ color:var(--sp-7); }
-.entry__key{
-  font-size:10px; letter-spacing:.22em;
-  color:var(--champagne);
-  border:1px solid currentColor;
-  border-radius:2px;
-  padding:3px 8px 2px;
-  align-self:flex-start;
-}
 .entry__when{ font-size:12.5px; letter-spacing:.13em; color:var(--paper-80); text-transform:uppercase; }
 .entry__where{ font-size:11px; letter-spacing:.2em; color:var(--paper-38); text-transform:uppercase; }
+
+.entry__head{
+  display:flex; flex-wrap:wrap; align-items:center;
+  gap:10px clamp(14px,1.6vw,22px);
+}
+/* Matched by optical area, not by raw height: a two-line lockup at the same
+   height as a wide single-line mark reads half the size. */
+.entry__logo{
+  display:none;
+  height:clamp(21px,2.3vw,29px);
+  width:auto; max-width:210px;
+  object-fit:contain; object-position:left center;
+  filter:grayscale(1) brightness(0) invert(1);
+  opacity:.92;
+  transition:opacity .5s var(--ease);
+}
+html.is-bone .entry__logo{ filter:grayscale(1) brightness(0); }
+.entry__logo[src*="springer"]{ height:clamp(31px,3.4vw,43px); }
+.entry__logo[src*="ibm"]{ height:clamp(18px,2.0vw,25px); }
+.entry__logo[src*="upes"]{ height:clamp(22px,2.4vw,30px); }
+.entry.has-logo .entry__logo{ display:block; }
+.entry.has-logo .entry__word{ display:none; }
+.entry__word{ font-size:clamp(19px,2.05vw,27px); }
+.entry:hover .entry__logo{ opacity:1; }
 
 .entry__body h3{
   font-family:var(--display);
@@ -1067,6 +1000,16 @@ html.is-bone .wall__logo{ filter:grayscale(1) brightness(0); opacity:.78; }
 }
 .cred--cert:hover .cred__plate img{ filter:none; transform:scale(1.045); }
 .cred--cert:hover .cred__plate::after{ opacity:.35; }
+
+.cred__logo{
+  height:clamp(24px,2.7vw,34px);
+  width:auto; max-width:200px;
+  object-fit:contain; object-position:left center;
+  filter:grayscale(1) brightness(0) invert(1);
+  opacity:.88;
+  margin-bottom:20px;
+}
+html.is-bone .cred__logo{ filter:grayscale(1) brightness(0); }
 
 .cred__key{
   display:inline-block;
@@ -1334,7 +1277,7 @@ body,
 .nav, .menu,
 .cap, .slide, .cred, .entry, .expand__panel,
 .slide__stats li, .stack__row, .cred__plate,
-.section, .wall-wrap, .contact, .foot, .corner{
+.section, .contact, .foot, .corner{
   transition:background-color .7s var(--ease),
              border-color .7s var(--ease),
              color .7s var(--ease);
