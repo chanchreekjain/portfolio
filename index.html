@@ -20,6 +20,10 @@
 
 <a class="skip" href="#statement">Skip to content</a>
 
+<!-- ══════════════════════════════ GROUND LAYERS ══════════════════════════════ -->
+<div class="ground" aria-hidden="true"></div>
+<canvas class="fabric" id="fabric" aria-hidden="true"></canvas>
+
 <!-- ══════════════════════════════ LOADER ══════════════════════════════ -->
 <div class="loader" id="loader" aria-hidden="true">
   <div class="loader__inner">
@@ -122,9 +126,9 @@
 </section>
 
 <!-- ══════════════════════════════ EXPANDING STATEMENT ══════════════════════════════ -->
-<section class="expand" id="statement">
+<section class="expand" id="statement" data-ground="bone" data-ground-from="0.44">
   <div class="expand__sticky">
-    <div class="expand__panel" id="expandPanel">
+    <div class="expand__panel bone-scope" id="expandPanel">
       <div class="expand__content">
         <span class="eyebrow expand__tag">01 — Profile</span>
         <p class="expand__lead">
@@ -144,7 +148,7 @@
 </section>
 
 <!-- ══════════════════════════════ CAPABILITIES ══════════════════════════════ -->
-<section class="caps section" aria-label="Capabilities">
+<section class="caps section" aria-label="Capabilities" data-ground="bone">
   <div class="section__head">
     <span class="eyebrow reveal">Index — Engineering alphabet</span>
     <h2 class="section__title reveal">Four surfaces<br />I build on.</h2>
@@ -182,7 +186,7 @@
 </section>
 
 <!-- ══════════════════════════════ AFFILIATIONS MARQUEE ══════════════════════════════ -->
-<section class="marquee-wrap" aria-label="Affiliations">
+<section class="marquee-wrap" aria-label="Affiliations" data-ground="bone">
   <span class="eyebrow marquee-wrap__tag">Where I've built</span>
   <div class="marquee" aria-hidden="true">
     <div class="marquee__track">
@@ -393,7 +397,7 @@
 </section>
 
 <!-- ══════════════════════════════ CREDENTIALS ══════════════════════════════ -->
-<section class="section credentials" id="credentials">
+<section class="section credentials" id="credentials" data-ground="bone">
   <div class="section__head">
     <span class="eyebrow reveal">04 — Proof</span>
     <h2 class="section__title reveal">Education &amp;<br />Credentials</h2>
@@ -478,8 +482,14 @@
 
 </main>
 
+<div class="corner" id="corner" aria-hidden="true">
+  <span>Chanchreek</span>
+  <span>Jain</span>
+</div>
+
 <div class="cursor" id="cursor" aria-hidden="true"><span class="cursor__dot"></span><span class="cursor__ring"></span></div>
 
+<script src="fabric.js"></script>
 <script src="main.js"></script>
 <script src="visuals.js"></script>
 </body>

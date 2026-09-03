@@ -139,6 +139,11 @@
   var tlFill     = $('#timelineFill');
   var timeline   = $('.timeline');
   var navAnchors = $$('.nav__links a');
+  var corner = $('#corner');
+  var boneSections = $$('[data-ground="bone"]').map(function (el) {
+    return { el: el, from: parseFloat(el.getAttribute('data-ground-from')) || 0 };
+  });
+  var isBone = false;
 
   var vw = window.innerWidth;
   var vh = window.innerHeight;
@@ -217,6 +222,36 @@
       var tr = timeline.getBoundingClientRect();
       var tp = clamp((vh * 0.72 - tr.top) / Math.max(tr.height, 1), 0, 1);
       tlFill.style.height = (tp * 100).toFixed(2) + '%';
+    }
+
+    /* — ground flip: ink ⇄ bone — */
+    var probe = vh * 0.10;
+    var bone = false;
+    for (var bi = 0; bi < boneSections.length; bi++) {
+      var bs = boneSections[bi];
+      var br = bs.el.getBoundingClientRect();
+      if (br.bottom <= probe || br.top > probe) continue;
+      if (bs.from > 0) {
+        // a section can ask for the flip partway through its own travel
+        var bTravel = Math.max(bs.el.offsetHeight - vh, 1);
+        if (clamp(-br.top / bTravel, 0, 1) < bs.from) continue;
+      }
+      bone = true; break;
+    }
+    if (bone !== isBone) {
+      isBone = bone;
+      document.documentElement.classList.toggle('is-bone', bone);
+    }
+
+    /* — sticky corner mark — */
+    if (corner) {
+      corner.classList.toggle('is-on', y > vh * 0.7);
+      if (gallery && !stacked) {
+        var cgr = gallery.getBoundingClientRect();
+        corner.classList.toggle('is-muted', cgr.top < vh * 0.5 && cgr.bottom > vh * 0.5);
+      } else {
+        corner.classList.remove('is-muted');
+      }
     }
 
     /* — active nav link — */

@@ -62,7 +62,7 @@ html.is-locked{ overflow:hidden; }
 
 body{
   margin:0;
-  background:var(--ink);
+  background:transparent;
   color:var(--paper);
   font-family:var(--ui);
   font-weight:300;
@@ -95,12 +95,15 @@ button{ font:inherit; color:inherit; background:none; border:0; cursor:pointer; 
   border-radius:2px;
 }
 
-/* film grain + vignette so flat black never looks like a dead screen */
+/* vignette so the flat ground never looks like a dead screen */
 body::after{
   content:"";
   position:fixed; inset:0; z-index:60; pointer-events:none;
   background:radial-gradient(135% 110% at 50% 42%, transparent 58%, rgba(0,0,0,.34) 100%);
+  opacity:1;
+  transition:opacity .6s var(--ease);
 }
+html.is-bone body::after{ opacity:0; }
 
 /* ═══════════════════════════════════════════════════════════════
    Shared atoms
@@ -1164,4 +1167,104 @@ body::after{
   .expand__content{ opacity:1 !important; transform:none !important; }
   .marquee__track{ animation:none; }
   .cursor{ display:none !important; }
+  .corner{ opacity:1 !important; transform:none !important; }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   Ground layers — the page inverts between ink and bone
+   ═══════════════════════════════════════════════════════════════ */
+
+:root{ --ground:#08080A; --fabric-accent:#5A97BA; }
+
+.ground{
+  position:fixed; inset:0; z-index:-2;
+  background:var(--ground);
+  transition:background-color .75s var(--ease);
+}
+.fabric{
+  position:fixed; inset:0; z-index:-1;
+  width:100%; height:100%;
+  pointer-events:none;
+  opacity:.85;
+}
+
+/* ── bone ── */
+html.is-bone,
+.bone-scope{
+  --ground:      #E6E1D6;
+  --fabric-accent:#2F6A8C;
+
+  --ink:         #E6E1D6;
+  --ink-2:       #EDE9E0;
+  --ink-3:       #F1EDE5;
+  --ink-4:       #F8F5EF;
+
+  --paper:       #17170F;
+  --paper-80:    rgba(23,23,15,.88);
+  --paper-56:    rgba(23,23,15,.74);
+  --paper-38:    rgba(23,23,15,.64);
+  --paper-22:    rgba(23,23,15,.34);
+
+  --line:        rgba(23,23,15,.13);
+  --line-2:      rgba(23,23,15,.22);
+
+  --champagne:   #8A6B34;
+  --champagne-d: #6E5426;
+
+  --sp-1:#A8443B; --sp-2:#9A6220; --sp-3:#7A6C1E;
+  --sp-4:#3C7642; --sp-5:#2F6A8C; --sp-6:#454A86; --sp-7:#6E3F84;
+}
+html.is-bone ::selection{ background:var(--champagne); color:#FAF8F3; }
+html.is-bone .cursor{ mix-blend-mode:normal; }
+html.is-bone .cursor__dot{ background:#17170F; }
+html.is-bone .cursor__ring{ border-color:rgba(23,23,15,.45); }
+html.is-bone .cursor.is-hot .cursor__ring{ border-color:rgba(23,23,15,.85); }
+
+/* certificates get a paper mount on bone instead of a dark one */
+html.is-bone .cred__plate{ background:#DCD7CB; }
+html.is-bone .cred__plate img{ filter:grayscale(.30) contrast(.98) brightness(.99); }
+html.is-bone .cred__plate::after{
+  background:linear-gradient(180deg, rgba(23,23,15,.03), rgba(23,23,15,.10));
+}
+
+/* the project stages stay dark on bone — they are screens, not paper */
+html.is-bone .stage__canvas,
+html.is-bone .med{ background:#0A0A0E; border-color:rgba(23,23,15,.18); }
+html.is-bone .med__row{ background:#0A0A0E; }
+html.is-bone .med__row.is-on{ background:#101017; }
+html.is-bone .med__row b{ color:#EDEAE4; }
+html.is-bone .med__rows{ background:rgba(237,234,228,.10); border-color:rgba(237,234,228,.10); }
+
+/* let the colour changes cross-fade instead of snapping */
+body,
+.nav, .menu,
+.cap, .slide, .cred, .entry, .expand__panel,
+.slide__stats li, .stack__row, .cred__plate,
+.section, .marquee-wrap, .contact, .foot, .corner{
+  transition:background-color .7s var(--ease),
+             border-color .7s var(--ease),
+             color .7s var(--ease);
+}
+
+html.is-bone .nav.is-stuck{ background:rgba(230,225,214,.76); }
+
+/* ═══════════════════════════════════════════════════════════════
+   Sticky corner mark
+   ═══════════════════════════════════════════════════════════════ */
+
+.corner{
+  position:fixed; left:var(--pad); bottom:22px; z-index:70;
+  pointer-events:none;
+  display:flex; flex-direction:column;
+  font-family:var(--display);
+  font-size:13px; line-height:1.16;
+  letter-spacing:.2em; text-transform:uppercase;
+  color:var(--paper-38);
+  opacity:0; transform:translateY(10px);
+  transition:opacity .7s var(--ease), transform .8s var(--ease-out), color .7s var(--ease);
+}
+.corner.is-on{ opacity:1; transform:none; }
+.corner.is-muted{ opacity:0; transform:translateY(6px); }
+
+@media (max-width:640px){ .corner{ font-size:11px; bottom:14px; } }
