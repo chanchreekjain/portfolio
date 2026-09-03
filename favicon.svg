@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="sp" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"    stop-color="#D2685E"/>
+      <stop offset="0.17" stop-color="#D7924A"/>
+      <stop offset="0.33" stop-color="#CDBA5B"/>
+      <stop offset="0.50" stop-color="#6BA26B"/>
+      <stop offset="0.67" stop-color="#5A97BA"/>
+      <stop offset="0.83" stop-color="#6A6DAE"/>
+      <stop offset="1"    stop-color="#9268A8"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="12" fill="#08080A"/>
+  <text x="32" y="34" text-anchor="middle" dominant-baseline="middle"
+        font-family="Georgia, 'Times New Roman', serif" font-size="24" letter-spacing="1.5"
+        fill="#EDEAE4">CJ</text>
+  <rect x="16" y="45" width="32" height="2" rx="1" fill="url(#sp)"/>
+</svg>
