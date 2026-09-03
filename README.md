@@ -2,7 +2,7 @@
 
 Personal portfolio for **Chanchreek Jain** — AI/ML & Intelligent Automation Engineer.
 
-Static site. No build step, no dependencies, no framework. Three files do the work:
+Static site. No build step, no dependencies, no framework:
 
 ```
 index.html     markup + content
@@ -38,9 +38,9 @@ vercel --prod   # production
 
 ## Design notes
 
-- **Palette** — near-black `#08080A`, warm off-white `#EDEAE4`, champagne `#CBB392`.
-  A desaturated spectrum is the only colour on the site: it appears in the loader,
-  the scroll rail, and as one-pixel accents. Nothing is saturated enough to glare.
+- **Palette** — ink `#0A0A0D`, bone `#E9E3D5`, warm off-white `#EDEAE4`, champagne
+  `#CBB392`. A desaturated spectrum is the only colour: the loader, the scroll rail,
+  the hero refraction, one hue per project. Nothing is saturated enough to glare.
 - **Type** — three roles, no CDN. **Bodoni Moda** (display) is a didone whose
   hairlines are the same gesture as the spectrum rules; **Archivo** (text and UI)
   is a grotesque with a width axis; **IBM Plex Mono** carries every figure, ID,
