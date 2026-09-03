@@ -514,18 +514,22 @@
   };
 
   /* ═══════════════ 04 · FACIAL EMOTION RECOGNITION ═══════════════
-     A landmark mesh, deliberately geometric rather than photographic:
-     brows, lids and mouth are driven by three expression weights, and
-     the meter underneath is those same weights.                       */
+     The same hand-drawn head as the walker, scaled up, with the landmark
+     mesh tracked onto it. Brows, lids and mouth are driven by the four
+     classifier weights, and the meter underneath is those same weights.
+
+     On canvas, y grows downward: a smile sags BELOW its corners, so the
+     mouth's mid-point is my + curve. Getting that sign backwards draws a
+     frown while the meter says HAPPY.                                    */
 
   var face = {
     init: function (s) {
       s.t = 0;
-      s.cur = [1,0,0];        // neutral, happy, surprise
-      s.target = [1,0,0];
-      s.next = 2.4;
-      s.names = ['NEUTRAL','HAPPY','SURPRISE'];
-      s.hues = [SPECTRUM.blue, SPECTRUM.orange, SPECTRUM.violet];
+      s.cur    = [1, 0, 0, 0];      // neutral, happy, sad, surprise
+      s.target = [1, 0, 0, 0];
+      s.next = 2.2;
+      s.names = ['NEUTRAL', 'HAPPY', 'SAD', 'SURPRISE'];
+      s.hues  = [SPECTRUM.blue, SPECTRUM.yellow, SPECTRUM.indigo, SPECTRUM.violet];
     },
 
     frame: function (s, dt) {
@@ -533,143 +537,161 @@
       s.t += dt;
 
       if (s.t > s.next) {
-        s.next = s.t + 2.4 + Math.random()*1.6;
-        var pick = Math.floor(Math.random()*3);
-        s.target = [0.08,0.08,0.08];
-        s.target[pick] = 0.84 + Math.random()*0.12;
+        s.next = s.t + 2.4 + Math.random() * 1.5;
+        var pick = Math.floor(Math.random() * 4);
+        s.target = [0.06, 0.06, 0.06, 0.06];
+        s.target[pick] = 0.86 + Math.random() * 0.11;
       }
-      for (var i=0;i<3;i++) s.cur[i] = lerp(s.cur[i], s.target[i], Math.min(dt*2.6,1));
+      for (var i = 0; i < 4; i++) s.cur[i] = lerp(s.cur[i], s.target[i], Math.min(dt * 2.6, 1));
 
-      var happy = s.cur[1], surp = s.cur[2];
+      var happy = s.cur[1], sad = s.cur[2], surp = s.cur[3];
 
-      ctx.clearRect(0,0,w,h);
-      ctx.fillStyle = '#0A0A0E'; ctx.fillRect(0,0,w,h);
-      ctx.strokeStyle = LINE; ctx.strokeRect(.5,.5,w-1,h-1);
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = '#0A0A0E'; ctx.fillRect(0, 0, w, h);
 
-      var meterH = 54;
-      var cx = w/2, cy = (h-meterH)/2 + 4;
-      var R = Math.min(w*0.20, (h-meterH)*0.36);
+      var meterH = 58;
+      var fieldH = h - meterH;
+      var cx = w / 2, cy = fieldH / 2 + 4;
+      var R  = Math.min(w * 0.19, fieldH * 0.32);
 
+      var ink = 'rgba(240,232,214,.95)';
+      var wob = function (k) { return Math.sin(s.t * 5.5 + k * 12.9898) * Math.max(R * 0.012, 0.6); };
       var pts = [];
-      function dot(x,y,strong){ pts.push([x,y,strong]); }
+      var dot = function (x, y, strong) { pts.push([x, y, strong]); };
 
-      /* jaw + skull outline */
-      var oval = [];
-      for (var a=0;a<26;a++){
-        var th = (a/26)*Math.PI*2 - Math.PI/2;
-        var rx = R*0.80, ry = R*1.06;
-        var ox = cx + Math.cos(th)*rx;
-        var oy = cy + Math.sin(th)*ry * (Math.sin(th) > 0 ? 1.06 : 0.94);
-        oval.push([ox,oy]);
+      ctx.save();
+      ctx.strokeStyle = ink;
+      ctx.lineWidth = Math.max(R * 0.055, 1.5);
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      /* head — a circle walked in short segments with a slow wobble on the
+         radius, so it reads drawn by hand rather than plotted */
+      var ring = [];
+      for (var a2 = 0; a2 <= 40; a2++) {
+        var th = (a2 / 40) * Math.PI * 2 - Math.PI / 2;
+        var rr = 1 + Math.sin(th * 3 + s.t * 0.7) * 0.022 + Math.sin(th * 5 - s.t * 0.4) * 0.014;
+        ring.push([cx + Math.cos(th) * R * 1.02 * rr, cy + Math.sin(th) * R * 1.08 * rr]);
       }
       ctx.beginPath();
-      oval.forEach(function(p,i2){ i2===0?ctx.moveTo(p[0],p[1]):ctx.lineTo(p[0],p[1]); });
+      ring.forEach(function (p, i2) { i2 === 0 ? ctx.moveTo(p[0], p[1]) : ctx.lineTo(p[0], p[1]); });
       ctx.closePath();
-      ctx.strokeStyle = 'rgba(237,234,228,.20)'; ctx.lineWidth = 1; ctx.stroke();
-      oval.forEach(function(p,i2){ if (i2%2===0) dot(p[0],p[1],0); });
+      ctx.stroke();
+      ring.forEach(function (p, i2) { if (i2 % 5 === 0 && i2 < 40) dot(p[0], p[1], 0); });
 
-      /* mesh chords — the "landmark graph" look */
-      ctx.save();
-      ctx.strokeStyle = 'rgba(90,151,186,.10)'; ctx.lineWidth = 1;
-      for (var m=0;m<oval.length;m+=2){
+      /* brows — surprise arches them, sadness lifts the inner ends */
+      var browY = cy - R * 0.44;
+      var lift  = surp * R * 0.20 + happy * R * 0.03;
+      [-1, 1].forEach(function (sgn) {
+        var bx0 = cx + sgn * R * 0.14, bx1 = cx + sgn * R * 0.62;
+        var inner = browY - lift - sad * R * 0.13;
+        var outer = browY - lift + sad * R * 0.09;
         ctx.beginPath();
-        ctx.moveTo(oval[m][0], oval[m][1]);
-        ctx.lineTo(oval[(m+9)%oval.length][0], oval[(m+9)%oval.length][1]);
+        sketch(ctx, bx0, inner + wob(1), bx1, outer + wob(2), R * 0.05 * (surp > 0.4 ? -1 : 0.3) * sgn);
         ctx.stroke();
-      }
-      ctx.restore();
+        dot(bx0, inner, 1); dot(bx1, outer, 1);
+      });
 
-      /* eyes — lids open with surprise, narrow with a smile */
-      var eyeY = cy - R*0.16;
-      var open = lerp(R*0.15, R*0.26, surp) * lerp(1, 0.62, happy);
-      [-1,1].forEach(function(sgn){
-        var ex = cx + sgn*R*0.36;
+      /* eyes — wide on surprise, squeezed by a smile */
+      var eyeY = cy - R * 0.14;
+      var open = lerp(R * 0.13, R * 0.27, surp) * lerp(1, 0.42, happy);
+      [-1, 1].forEach(function (sgn) {
+        var ex = cx + sgn * R * 0.38, ew = R * 0.25;
         ctx.beginPath();
-        for (var e=0;e<=12;e++){
-          var u = e/12, ang = Math.PI*u;
-          var px = ex + Math.cos(Math.PI-ang)*R*0.26;
-          var py = eyeY - Math.sin(ang)*open;
-          e===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
+        if (happy > 0.55) {
+          // a smile closes the eyes into upward arcs
+          ctx.moveTo(ex - ew, eyeY + open * 0.5);
+          ctx.quadraticCurveTo(ex, eyeY - open * 1.5, ex + ew, eyeY + open * 0.5);
+        } else {
+          ctx.ellipse(ex + wob(3), eyeY, ew, open, 0, 0, Math.PI * 2);
         }
-        for (var e2=12;e2>=0;e2--){
-          var u2 = e2/12, ang2 = Math.PI*u2;
-          var px2 = ex + Math.cos(Math.PI-ang2)*R*0.26;
-          var py2 = eyeY + Math.sin(ang2)*open*lerp(1,0.45,happy);
-          ctx.lineTo(px2,py2);
+        ctx.stroke();
+        if (happy <= 0.55) {
+          ctx.beginPath();
+          ctx.arc(ex + sgn * open * 0.18, eyeY + (sad ? open * 0.22 : 0),
+                  Math.max(open * 0.34, 1.4), 0, Math.PI * 2);
+          ctx.fillStyle = ink; ctx.fill();
         }
-        ctx.closePath();
-        ctx.strokeStyle = 'rgba(237,234,228,.42)'; ctx.stroke();
-        dot(ex - R*0.26, eyeY, 1); dot(ex + R*0.26, eyeY, 1);
-        dot(ex, eyeY - open, 1);   dot(ex, eyeY + open*lerp(1,0.45,happy), 1);
-
-        /* brow */
-        var browLift = surp*R*0.16 - happy*R*0.02;
-        ctx.beginPath();
-        for (var b=0;b<=8;b++){
-          var bu = b/8;
-          var bx = ex + lerp(-R*0.30, R*0.30, bu);
-          var by = eyeY - R*0.30 - browLift - Math.sin(bu*Math.PI)*R*0.05*(1+surp*0.7);
-          b===0?ctx.moveTo(bx,by):ctx.lineTo(bx,by);
-        }
-        ctx.strokeStyle = 'rgba(237,234,228,.34)'; ctx.stroke();
+        dot(ex - ew, eyeY, 1); dot(ex + ew, eyeY, 1);
       });
 
       /* nose */
       ctx.beginPath();
-      ctx.moveTo(cx, cy - R*0.06);
-      ctx.lineTo(cx - R*0.09, cy + R*0.20);
-      ctx.lineTo(cx + R*0.06, cy + R*0.22);
-      ctx.strokeStyle = 'rgba(237,234,228,.22)'; ctx.stroke();
-      dot(cx, cy - R*0.06, 1); dot(cx - R*0.09, cy + R*0.20, 1);
+      sketch(ctx, cx + wob(4), cy - R * 0.02, cx - R * 0.10, cy + R * 0.24, R * 0.02);
+      ctx.stroke();
+      dot(cx - R * 0.10, cy + R * 0.24, 1);
 
-      /* mouth — curve from smile weight, opening from surprise */
-      var my = cy + R*0.52;
-      var half = lerp(R*0.30, R*0.20, surp) * lerp(1, 1.18, happy);
-      var curve = happy*R*0.26 - surp*R*0.04;
-      var gapM  = surp*R*0.20;
+      /* mouth */
+      var my = cy + R * 0.55;
+      var half = R * 0.34 * lerp(1, 0.62, surp);
+      var curve = happy * R * 0.30 - sad * R * 0.26;   // + sags into a smile, − arches into a frown
+      var gapM  = surp * R * 0.24;
+
       ctx.beginPath();
-      for (var mm=0;mm<=16;mm++){
-        var mu = mm/16;
-        var mx = cx + lerp(-half, half, mu);
-        var myy = my - Math.sin(mu*Math.PI)*curve - gapM*0.5*Math.sin(mu*Math.PI);
-        mm===0?ctx.moveTo(mx,myy):ctx.lineTo(mx,myy);
+      if (gapM > R * 0.06) {
+        ctx.ellipse(cx, my, half * 0.66, gapM, 0, 0, Math.PI * 2);   // open, on surprise
+        dot(cx, my - gapM, 1); dot(cx, my + gapM, 1);
+      } else {
+        var x0 = cx - half, x1 = cx + half;
+        ctx.moveTo(x0, my - curve * 0.35);
+        ctx.quadraticCurveTo(cx + wob(5), my + curve * 1.15, x1, my - curve * 0.35);
+        dot(cx, my + curve * 0.6, 1);
       }
-      if (gapM > 1) {
-        for (var mm2=16;mm2>=0;mm2--){
-          var mu2 = mm2/16;
-          var mx2 = cx + lerp(-half, half, mu2);
-          var my2 = my - Math.sin(mu2*Math.PI)*curve + gapM*0.9*Math.sin(mu2*Math.PI);
-          ctx.lineTo(mx2,my2);
-        }
-        ctx.closePath();
-      }
-      ctx.strokeStyle = 'rgba(237,234,228,.55)'; ctx.lineWidth = 1.2; ctx.stroke();
-      dot(cx-half, my, 1); dot(cx+half, my, 1); dot(cx, my-curve-gapM*0.5, 1);
+      ctx.stroke();
+      dot(cx - half, my - curve * 0.35, 1);
+      dot(cx + half, my - curve * 0.35, 1);
+      ctx.restore();
 
-      /* landmark dots last, over everything */
-      pts.forEach(function(p){
+      /* mesh chords, then the landmarks over everything */
+      ctx.save();
+      ctx.strokeStyle = 'rgba(215,146,74,.13)'; ctx.lineWidth = 1;
+      for (var m = 0; m < pts.length - 1; m++) {
+        var n1 = pts[m], n2 = pts[m + 1];
+        var dxm = n2[0] - n1[0], dym = n2[1] - n1[1];
+        if (dxm * dxm + dym * dym > R * R * 0.62) continue;   // no long traverses
+        ctx.beginPath(); ctx.moveTo(n1[0], n1[1]); ctx.lineTo(n2[0], n2[1]); ctx.stroke();
+      }
+      ctx.restore();
+
+      pts.forEach(function (p) {
         ctx.beginPath();
-        ctx.arc(p[0], p[1], p[2] ? 1.7 : 1.1, 0, Math.PI*2);
-        ctx.fillStyle = p[2] ? 'rgba(203,179,146,.9)' : 'rgba(237,234,228,.30)';
+        ctx.arc(p[0], p[1], p[2] ? 2 : 1.2, 0, Math.PI * 2);
+        ctx.fillStyle = p[2] ? 'rgba(203,179,146,.95)' : 'rgba(237,234,228,.34)';
         ctx.fill();
       });
 
+      /* tracking bracket */
+      var bw = R * 2.5, bh = R * 2.7, bx = cx - bw / 2, by = cy - bh / 2, arm = bw * 0.16;
+      ctx.save();
+      ctx.strokeStyle = 'rgba(215,146,74,.55)'; ctx.lineWidth = 1.3;
+      [[bx,by,1,1],[bx+bw,by,-1,1],[bx,by+bh,1,-1],[bx+bw,by+bh,-1,-1]].forEach(function (c) {
+        ctx.beginPath();
+        ctx.moveTo(c[0] + c[2] * arm, c[1]);
+        ctx.lineTo(c[0], c[1]);
+        ctx.lineTo(c[0], c[1] + c[3] * arm);
+        ctx.stroke();
+      });
+      ctx.restore();
+
       label(ctx, 'LANDMARK MESH — 68 PT', 16, 14, 9, SPECTRUM.orange);
-      var fps = labelWidth(ctx, 'REAL-TIME', 8);
-      label(ctx, 'REAL-TIME', w-16-fps, 15, 8, 'rgba(237,234,228,.28)');
+      var rt = labelWidth(ctx, 'REAL-TIME', 8);
+      label(ctx, 'REAL-TIME', w - 16 - rt, 15, 8, 'rgba(237,234,228,.34)');
 
       /* classifier meter */
-      var mY = h - meterH + 12, barW = (w-32-24)/3;
-      for (var q=0;q<3;q++){
-        var bx0 = 16 + q*(barW+12);
+      var mY = h - meterH + 14, gap = 10, barW = (w - 32 - gap * 3) / 4;
+      for (var k = 0; k < 4; k++) {
+        var bx0 = 16 + k * (barW + gap);
         ctx.fillStyle = 'rgba(237,234,228,.09)';
-        ctx.fillRect(bx0, mY+14, barW, 3);
-        ctx.fillStyle = s.hues[q];
-        ctx.fillRect(bx0, mY+14, barW*clamp(s.cur[q],0,1), 3);
-        label(ctx, s.names[q], bx0, mY, 8, s.cur[q] > .5 ? PAPER : DIM);
-        var pv = (s.cur[q]*100).toFixed(0)+'%';
-        label(ctx, pv, bx0+barW-labelWidth(ctx,pv,8), mY, 8, DIM);
+        ctx.fillRect(bx0, mY + 14, barW, 3);
+        ctx.fillStyle = s.hues[k];
+        ctx.fillRect(bx0, mY + 14, barW * clamp(s.cur[k], 0, 1), 3);
+        label(ctx, s.names[k], bx0, mY, 8, s.cur[k] > 0.5 ? PAPER : DIM);
+        var pv = (s.cur[k] * 100).toFixed(0) + '%';
+        label(ctx, pv, bx0 + barW - labelWidth(ctx, pv, 8), mY, 8, DIM);
       }
+
+      ctx.strokeStyle = LINE; ctx.lineWidth = 1;
+      ctx.strokeRect(0.5, 0.5, w - 1, h - 1);
     }
   };
 
