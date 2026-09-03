@@ -1457,3 +1457,86 @@ html.is-bone .expand__lead{ font-weight:400; }
   .hero__prism{ animation:none; -webkit-mask-position:40% 0; mask-position:40% 0; }
   .grain{ opacity:.04; }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   Phone pass
+   The desktop layout survives a narrow window; it doesn't survive a
+   phone. Everything below is about length, legibility and thumbs.
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (max-width:900px){
+
+  /* The corner mark only stood aside for the PINNED gallery — which never
+     pins on a phone — so it sat on top of the cards. It also just repeats
+     the nav mark two centimetres away. */
+  .corner{ display:none !important; }
+
+  /* The profile panel stops being a scroll-driven expander. On a phone it
+     was spending 2.4 screens of scrolling to grow a box. */
+  .expand{ height:auto; }
+  .expand__sticky{ position:static; height:auto; display:block; overflow:visible; }
+  .expand__panel{
+    width:100% !important; height:auto !important;
+    border-radius:0; border-left:0; border-right:0;
+    padding:clamp(52px,11vh,86px) 0;
+  }
+  .js .expand__content{ opacity:1 !important; transform:none !important; }
+  .expand__content{ width:100%; padding:0 var(--pad); }
+  .expand__panel::before{ opacity:.7 !important; }
+
+  /* 10px mono is unreadable at arm's length */
+  .eyebrow{ font-size:11px; letter-spacing:.16em; }
+  .slide__key,.stage__caption{ font-size:10.5px; }
+  .entry__when{ font-size:12px; }
+  .cred__facts span{ font-size:13px; }
+  .cred__facts i{ font-size:10px; }
+
+  /* thumbs need something to hit — these were 15–25px tall */
+  .contact__links{ flex-direction:column; gap:0; margin-top:clamp(30px,5vh,48px); }
+  .contact__links a{
+    height:auto; padding:17px 0; width:100%;
+    border-bottom:1px solid var(--line);
+    font-size:12px;
+  }
+  .contact__links a:first-child{ border-top:1px solid var(--line); }
+  .menu__list a{ padding:16px 0; }
+  .menu__block a{ display:block; padding:11px 0; }
+  .foot__top{ display:inline-block; padding:14px 0; }
+  .nav__mark{ padding:6px 0; }
+}
+
+@media (max-width:640px){
+
+  /* the hero was bottom-aligned with a void above it */
+  .hero{ justify-content:center; padding-top:104px; padding-bottom:34px; }
+  .hero__meta{ gap:20px 0; padding-top:20px; }
+  .hero__foot{ margin-top:clamp(26px,5vh,42px); }
+
+  /* the simulations were letterboxed into a strip */
+  .stage__canvas,.med{ aspect-ratio:5 / 4; }
+
+  /* the project cards were each about a screen and a half */
+  .slide{ padding:20px 18px; border-radius:10px; }
+  .slide__body{ padding-right:0; }
+  .slide__num{
+    position:static; display:block;
+    margin:0 0 10px; font-size:32px; line-height:1;
+    opacity:.65;
+  }
+  .slide__desc{ font-size:14px; line-height:1.68; margin-bottom:22px; }
+  .slide__stats li{ padding:10px 12px; gap:4px; }
+  .slide__stats span{ font-size:9.5px; letter-spacing:.13em; }
+  .slide__stats b{ font-size:13px; }
+  .slide__tags{ gap:7px; }
+  .slide__tags span{ font-size:10px; padding:5px 10px 4px; letter-spacing:.12em; }
+
+  /* the extraction rows were squeezing the value into a sliver */
+  .med{ padding:16px 14px; }
+  .med__row{ flex-direction:column; align-items:flex-start; gap:2px; padding:7px 10px; }
+  .med__row i{ flex:none; font-size:8.5px; }
+
+  /* long credential IDs shouldn't set the card width */
+  .cred__facts span{ word-break:break-word; }
+  .cred{ padding:22px 20px; }
+  .cred--wide .cred__facts{ gap:14px 26px; }
+}
