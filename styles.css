@@ -1540,3 +1540,19 @@ html.is-bone .expand__lead{ font-weight:400; }
   .cred{ padding:22px 20px; }
   .cred--wide .cred__facts{ gap:14px 26px; }
 }
+
+/* ── the projects scroll trap ──────────────────────────────────────────
+   Each card carries overflow-y:auto + overscroll-behavior:contain so a
+   card taller than the pinned viewport can scroll on its own on desktop.
+   On a phone the card fills the screen, so every swipe landed inside that
+   scroll container — and `contain` stops the gesture chaining out to the
+   page. The page simply stopped moving at the projects section.
+   The page itself scrolls on a phone, so the card must not.            */
+@media (max-width:900px){
+  .slide{
+    overflow:visible;
+    overscroll-behavior:auto;
+    align-self:auto;
+    touch-action:auto;
+  }
+}
