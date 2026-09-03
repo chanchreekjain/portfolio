@@ -164,6 +164,7 @@
   var timeline   = $('.timeline');
   var navAnchors = $$('.nav__links a');
   var corner = $('#corner');
+  var footEl = $('.foot');
   var boneSections = $$('[data-ground="bone"]').map(function (el) {
     return { el: el, from: parseFloat(el.getAttribute('data-ground-from')) || 0 };
   });
@@ -270,12 +271,17 @@
     /* — sticky corner mark — */
     if (corner) {
       corner.classList.toggle('is-on', y > vh * 0.7);
+      var mute = false;
+      // step out of the pinned gallery's way
       if (gallery && !stacked) {
         var cgr = gallery.getBoundingClientRect();
-        corner.classList.toggle('is-muted', cgr.top < vh * 0.5 && cgr.bottom > vh * 0.5);
-      } else {
-        corner.classList.remove('is-muted');
+        mute = cgr.top < vh * 0.5 && cgr.bottom > vh * 0.5;
       }
+      // and out of the footer's, which already carries the name
+      if (!mute && footEl) {
+        mute = footEl.getBoundingClientRect().top < vh;
+      }
+      corner.classList.toggle('is-muted', mute);
     }
 
     /* — active nav link — */

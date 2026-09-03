@@ -1107,10 +1107,15 @@ html.is-bone .wall__logo{ filter:grayscale(1) brightness(0); opacity:.78; }
 
 .contact{
   position:relative;
+  /* at least a full viewport, so the credentials chapter clears the ground
+     probe and the page actually flips back to ink for the ending */
+  min-height:100svh;
+  display:flex; flex-direction:column;
   padding:clamp(90px,15vh,180px) var(--pad) 0;
   border-top:1px solid var(--line);
   overflow:hidden;
 }
+.contact__inner{ flex:1 1 auto; }
 .contact__spectrum{
   position:absolute; top:0; left:0; right:0; height:1px;
   background:var(--spectrum); opacity:.55;
