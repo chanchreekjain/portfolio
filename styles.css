@@ -1,14 +1,56 @@
 /* ═══════════════════════════════════════════════════════════════
+   Typefaces — self-hosted, SIL Open Font License.
+   Licences ship in assets/fonts/.
+
+     Bodoni Moda    display   — a didone; its hairlines are the
+                                same gesture as the spectrum rules
+     Archivo        text/UI   — grotesque with a width axis, set
+                                wide for labels
+     IBM Plex Mono  data      — every figure, ID, date and readout
+   ═══════════════════════════════════════════════════════════════ */
+
+@font-face{
+  font-family:"Bodoni Moda";
+  src:url("assets/fonts/bodoni-moda.woff2") format("woff2");
+  font-weight:400 900; font-style:normal; font-display:swap;
+}
+@font-face{
+  font-family:"Bodoni Moda";
+  src:url("assets/fonts/bodoni-moda-italic.woff2") format("woff2");
+  font-weight:400 900; font-style:italic; font-display:swap;
+}
+@font-face{
+  font-family:"Archivo";
+  src:url("assets/fonts/archivo.woff2") format("woff2");
+  font-weight:100 900; font-stretch:62% 125%; font-style:normal; font-display:swap;
+}
+@font-face{
+  font-family:"Plex Mono";
+  src:url("assets/fonts/plex-mono-300.woff2") format("woff2");
+  font-weight:300; font-style:normal; font-display:swap;
+}
+@font-face{
+  font-family:"Plex Mono";
+  src:url("assets/fonts/plex-mono-400.woff2") format("woff2");
+  font-weight:400; font-style:normal; font-display:swap;
+}
+@font-face{
+  font-family:"Plex Mono";
+  src:url("assets/fonts/plex-mono-500.woff2") format("woff2");
+  font-weight:500; font-style:normal; font-display:swap;
+}
+
+/* ═══════════════════════════════════════════════════════════════
    Chanchreek Jain — Portfolio
    Tokens
    ═══════════════════════════════════════════════════════════════ */
 
 :root{
   /* surface */
-  --ink:        #08080A;
-  --ink-2:      #0C0C10;
-  --ink-3:      #121218;
-  --ink-4:      #17171E;
+  --ink:        #0A0A0D;
+  --ink-2:      #0E0E13;
+  --ink-3:      #14141B;
+  --ink-4:      #1A1A23;
 
   /* type */
   --paper:      #EDEAE4;
@@ -39,8 +81,9 @@
       var(--sp-4) 50%, var(--sp-5) 67%, var(--sp-6) 83%, var(--sp-7) 100%);
 
   /* type scale */
-  --display: "Marcellus", "Cormorant Garamond", Georgia, "Times New Roman", serif;
-  --ui:      "Jost", "Futura", "Century Gothic", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --display: "Bodoni Moda", "Didot", "Bodoni MT", Georgia, serif;
+  --ui:      "Archivo", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, sans-serif;
+  --mono:    "Plex Mono", "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
 
   --pad: clamp(20px, 5vw, 84px);
   --ease: cubic-bezier(.22,.61,.36,1);
@@ -65,7 +108,8 @@ body{
   background:transparent;
   color:var(--paper);
   font-family:var(--ui);
-  font-weight:300;
+  font-weight:350;
+  font-stretch:100%;
   font-size:16px;
   line-height:1.65;
   letter-spacing:.005em;
@@ -111,10 +155,10 @@ html.is-bone body::after{ opacity:0; }
 
 .eyebrow{
   display:block;
-  font-family:var(--ui);
+  font-family:var(--mono);
   font-size:10px;
   font-weight:400;
-  letter-spacing:.28em;
+  letter-spacing:.2em;
   text-transform:uppercase;
   color:var(--paper-38);
 }
@@ -452,7 +496,7 @@ html.is-bone body::after{ opacity:0; }
   text-transform:uppercase;
   margin-bottom:clamp(28px,5vh,58px);
 }
-.hero__line{ display:block; overflow:hidden; padding-bottom:.04em; }
+.hero__line{ display:block; overflow:hidden; padding-bottom:.20em; margin-bottom:-.14em; }
 .hero__word{ display:block; }
 .hero__word .ch{ display:inline-block; }
 .js .hero__word .ch{ transform:translateY(105%) rotate(3deg); opacity:0; }
@@ -1175,7 +1219,7 @@ html.is-bone body::after{ opacity:0; }
    Ground layers — the page inverts between ink and bone
    ═══════════════════════════════════════════════════════════════ */
 
-:root{ --ground:#08080A; --fabric-accent:#5A97BA; }
+:root{ --ground:#0A0A0D; --fabric-accent:#5A97BA; }
 
 .ground{
   position:fixed; inset:0; z-index:-2;
@@ -1192,13 +1236,13 @@ html.is-bone body::after{ opacity:0; }
 /* ── bone ── */
 html.is-bone,
 .bone-scope{
-  --ground:      #E6E1D6;
+  --ground:      #E9E3D5;
   --fabric-accent:#2F6A8C;
 
-  --ink:         #E6E1D6;
-  --ink-2:       #EDE9E0;
-  --ink-3:       #F1EDE5;
-  --ink-4:       #F8F5EF;
+  --ink:         #E9E3D5;
+  --ink-2:       #F0EBDF;
+  --ink-3:       #F4F0E6;
+  --ink-4:       #FAF7F0;
 
   --paper:       #17170F;
   --paper-80:    rgba(23,23,15,.88);
@@ -1222,7 +1266,7 @@ html.is-bone .cursor__ring{ border-color:rgba(23,23,15,.45); }
 html.is-bone .cursor.is-hot .cursor__ring{ border-color:rgba(23,23,15,.85); }
 
 /* certificates get a paper mount on bone instead of a dark one */
-html.is-bone .cred__plate{ background:#DCD7CB; }
+html.is-bone .cred__plate{ background:#DFD8C8; }
 html.is-bone .cred__plate img{ filter:grayscale(.30) contrast(.98) brightness(.99); }
 html.is-bone .cred__plate::after{
   background:linear-gradient(180deg, rgba(23,23,15,.03), rgba(23,23,15,.10));
@@ -1247,7 +1291,7 @@ body,
              color .7s var(--ease);
 }
 
-html.is-bone .nav.is-stuck{ background:rgba(230,225,214,.76); }
+html.is-bone .nav.is-stuck{ background:rgba(233,227,213,.78); }
 
 /* ═══════════════════════════════════════════════════════════════
    Sticky corner mark
@@ -1268,3 +1312,143 @@ html.is-bone .nav.is-stuck{ background:rgba(230,225,214,.76); }
 .corner.is-muted{ opacity:0; transform:translateY(6px); }
 
 @media (max-width:640px){ .corner{ font-size:11px; bottom:14px; } }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   Editorial layer
+   Optical sizing for the didone, mono for every readout, grain,
+   and the refraction that runs through the hero.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── grain: paper on bone, film on ink ── */
+.grain{
+  position:fixed; inset:0; z-index:61;
+  pointer-events:none;
+  opacity:.055;
+  mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:200px 200px;
+}
+html.is-bone .grain{ opacity:.085; mix-blend-mode:multiply; }
+
+/* ── display: Bodoni wants its optical size set by hand ── */
+.hero__name,
+.hero__prism .hero__name{
+  font-weight:500;
+  font-variation-settings:"opsz" 96;
+  letter-spacing:-.028em;
+  line-height:.92;
+}
+.section__title{
+  font-weight:450;
+  font-variation-settings:"opsz" 72;
+  letter-spacing:-.022em;
+}
+.contact__title{ font-weight:450; font-variation-settings:"opsz" 88; letter-spacing:-.03em; }
+.expand__lead{ font-weight:400; font-variation-settings:"opsz" 56; letter-spacing:-.012em; line-height:1.2; }
+.expand__lead em{ font-style:italic; font-weight:450; }
+.gallery__title,
+.slide__title,
+.entry__body h3,
+.cred h3{ font-weight:500; font-variation-settings:"opsz" 30; letter-spacing:-.014em; }
+.menu__list a{ font-weight:450; font-variation-settings:"opsz" 60; letter-spacing:-.02em; }
+.marquee__track span{ font-weight:500; font-variation-settings:"opsz" 48; }
+.nav__mark-glyph{ font-weight:600; font-variation-settings:"opsz" 14; letter-spacing:.14em; }
+.loader__name{ font-weight:450; font-variation-settings:"opsz" 24; letter-spacing:.2em; }
+.corner{ font-weight:500; font-variation-settings:"opsz" 14; }
+html.is-bone .hero__name,
+html.is-bone .section__title,
+html.is-bone .contact__title{ font-weight:400; }
+
+/* ── wide grotesque for the navigational furniture ── */
+.nav__links a,
+.nav__trigger-label,
+.contact__links a,
+.slide__tags span{
+  font-family:var(--mono);
+  font-weight:400;
+  letter-spacing:.18em;
+}
+.hero__eyebrow{ font-family:var(--mono); letter-spacing:.26em; font-weight:400; }
+.entry__body h3 em{ font-family:var(--mono); letter-spacing:.16em; font-size:11px; }
+.cap h3{ font-weight:500; font-variation-settings:"opsz" 24; }
+
+/* ── every figure, ID and readout is mono ── */
+.slide__stats b,
+.med__row b,
+.cred__facts span,
+.entry__when,
+.gallery__index,
+.loader__count,
+.hero__meta-item p,
+.stack__row p{
+  font-family:var(--mono);
+  font-weight:400;
+  font-variation-settings:normal;
+  letter-spacing:.01em;
+  font-variant-numeric:tabular-nums;
+}
+.slide__stats b{ font-size:clamp(13px,1.15vw,16px); letter-spacing:0; }
+.med__row b{ font-size:clamp(11.5px,1vw,13.5px); }
+.cred__facts span{ font-size:12.5px; letter-spacing:.015em; }
+.hero__meta-item p{ font-size:13px; letter-spacing:.02em; }
+.stack__row p{ font-size:12.5px; letter-spacing:.03em; line-height:1.9; }
+.entry__when{ font-size:11.5px; letter-spacing:.14em; }
+
+/* ── section heads become an editorial two-column ── */
+@media (min-width:900px){
+  .section__head{
+    display:grid;
+    grid-template-columns:minmax(150px,210px) 1fr;
+    gap:clamp(24px,4vw,72px);
+    align-items:start;
+  }
+  .section__head > .eyebrow:first-child{ padding-top:.9em; }
+  .section__title{ margin-top:0; }
+}
+
+/* ── the hero refraction ── */
+.hero__type{ position:relative; }
+.hero__prism{
+  position:absolute; inset:0;
+  pointer-events:none;
+  /* a narrow spectral band travelling across the letterforms — the
+     background is transparent everywhere else, so the white name
+     underneath shows through */
+  background-image:linear-gradient(100deg,
+    transparent 0%,    transparent 25.5%,
+    var(--sp-1) 27.5%, var(--sp-2) 29.5%, var(--sp-3) 31.5%,
+    var(--sp-4) 33.5%, var(--sp-5) 35.5%, var(--sp-6) 37.5%,
+    var(--sp-7) 39.5%, transparent 41.5%, transparent 100%);
+  background-size:300% 100%;
+  background-repeat:no-repeat;
+  background-position:66% 0;
+  -webkit-background-clip:text; background-clip:text;
+  color:transparent; -webkit-text-fill-color:transparent;
+  animation:refract 12s cubic-bezier(.5,0,.5,1) infinite;
+}
+.hero__prism .hero__name{ margin-bottom:0; }
+.hero__prism .ch{ opacity:1 !important; transform:none !important; }
+@keyframes refract{
+  0%, 8%    { background-position:66% 0; }
+  66%, 100% { background-position:-12% 0; }
+}
+
+/* ── spec-sheet corner ticks on the panels that carry data ── */
+.slide::after,
+.cred--cert::after{
+  content:"";
+  position:absolute; right:14px; bottom:14px;
+  width:10px; height:10px;
+  border-right:1px solid var(--line-2);
+  border-bottom:1px solid var(--line-2);
+  background:none;
+  border-radius:0;
+  pointer-events:none;
+}
+.slide::after{ right:14px; bottom:14px; width:12px; height:12px; }
+
+@media (prefers-reduced-motion:reduce){
+  .hero__prism{ animation:none; -webkit-mask-position:40% 0; mask-position:40% 0; }
+  .grain{ opacity:.04; }
+}

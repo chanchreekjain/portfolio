@@ -36,6 +36,15 @@
     el.appendChild(frag);
   });
 
+  /* the refraction layer is a mute copy of the name, clipped to a spectrum */
+  var heroName = $('#heroName'), heroPrism = $('#heroPrism');
+  if (heroName && heroPrism) {
+    var clone = document.createElement('div');
+    clone.className = 'hero__name';
+    clone.innerHTML = heroName.innerHTML;
+    heroPrism.appendChild(clone);
+  }
+
   /* ───────────────────────────── loader ───────────────────────────── */
   var loader   = $('#loader');
   var beamFill = $('#beamFill');

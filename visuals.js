@@ -29,7 +29,7 @@
 
   function label(ctx, text, x, y, size, color, spacing) {
     ctx.save();
-    ctx.font = '400 ' + (size||9) + 'px Jost, "Segoe UI", sans-serif';
+    ctx.font = '400 ' + (size||9) + 'px "Plex Mono", ui-monospace, Menlo, monospace';
     ctx.fillStyle = color || DIM;
     ctx.textBaseline = 'top';
     var sp = spacing === undefined ? 1.6 : spacing;
@@ -43,7 +43,7 @@
 
   function labelWidth(ctx, text, size, spacing) {
     ctx.save();
-    ctx.font = '400 ' + (size||9) + 'px Jost, "Segoe UI", sans-serif';
+    ctx.font = '400 ' + (size||9) + 'px "Plex Mono", ui-monospace, Menlo, monospace';
     var sp = spacing === undefined ? 1.6 : spacing, w = 0;
     for (var i=0;i<text.length;i++) w += ctx.measureText(text[i]).width + sp;
     ctx.restore();

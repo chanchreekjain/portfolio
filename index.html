@@ -10,9 +10,8 @@
 <meta property="og:description" content="LLM tooling and agent skills at Oracle, NLP resume parsing at IBM, deep reinforcement learning and edge computer vision." />
 <meta property="og:type" content="website" />
 <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Jost:wght@200;300;400;500&family=Marcellus&display=swap" rel="stylesheet" />
+<link rel="preload" href="assets/fonts/bodoni-moda.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="assets/fonts/archivo.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="stylesheet" href="styles.css" />
 <script>document.documentElement.className += " js";</script>
 </head>
@@ -23,6 +22,7 @@
 <!-- ══════════════════════════════ GROUND LAYERS ══════════════════════════════ -->
 <div class="ground" aria-hidden="true"></div>
 <canvas class="fabric" id="fabric" aria-hidden="true"></canvas>
+<div class="grain" aria-hidden="true"></div>
 
 <!-- ══════════════════════════════ LOADER ══════════════════════════════ -->
 <div class="loader" id="loader" aria-hidden="true">
@@ -104,10 +104,13 @@
   <div class="hero__inner">
     <p class="hero__eyebrow reveal">AI/ML &amp; Intelligent Automation Engineer</p>
 
-    <h1 class="hero__name" aria-label="Chanchreek Jain">
-      <span class="hero__line"><span class="hero__word" data-split>Chanchreek</span></span>
-      <span class="hero__line"><span class="hero__word" data-split>Jain</span></span>
-    </h1>
+    <div class="hero__type">
+      <h1 class="hero__name" id="heroName" aria-label="Chanchreek Jain">
+        <span class="hero__line"><span class="hero__word" data-split>Chanchreek</span></span>
+        <span class="hero__line"><span class="hero__word" data-split>Jain</span></span>
+      </h1>
+      <div class="hero__prism" id="heroPrism" aria-hidden="true"></div>
+    </div>
 
     <div class="hero__meta">
       <div class="hero__meta-item reveal"><span class="eyebrow">Focus</span><p>LLM tooling · Agent skills · Deep RL · Computer vision</p></div>
@@ -132,9 +135,9 @@
       <div class="expand__content">
         <span class="eyebrow expand__tag">01 — Profile</span>
         <p class="expand__lead">
-          Final-year Computer Science <em>(AI/ML)</em> student with internship experience at
-          Oracle and IBM building LLM-driven tooling — agent skills, retrieval-based workflows
-          and model evaluation — alongside applied deep learning projects in reinforcement
+          Computer Science graduate <em>(AI/ML)</em> with internship experience at Oracle
+          and IBM building LLM-driven tooling — agent skills, retrieval-based workflows and
+          model evaluation — alongside applied deep learning projects in reinforcement
           learning and computer vision.
         </p>
         <p class="expand__sub">
@@ -410,7 +413,8 @@
       <p class="cred__line">B.Tech, Computer Science — specialisation in AI/ML</p>
       <div class="cred__facts">
         <span><i>CGPA</i>9.2 / 10</span>
-        <span><i>Term</i>Aug 2022 — Oct 2026 (expected)</span>
+        <span><i>Term</i>Aug 2022 — 2026</span>
+        <span><i>Status</i>Graduated — provisional degree issued</span>
         <span><i>Where</i>Dehradun, India</span>
       </div>
     </article>
