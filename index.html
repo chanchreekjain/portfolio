@@ -206,8 +206,12 @@
     <div class="gallery__track" id="galleryTrack">
 
       <article class="slide" data-accent="0">
-        <div class="slide__num">01</div>
+        <div class="slide__stage">
+          <canvas class="stage__canvas" data-viz="poaching" aria-hidden="true"></canvas>
+          <span class="stage__caption eyebrow">Live simulation of the trigger pipeline</span>
+        </div>
         <div class="slide__body">
+          <span class="slide__num" aria-hidden="true">01</span>
           <span class="eyebrow slide__key">PD — Aug 2025 → Dec 2025</span>
           <h3 class="slide__title">Poaching Detection Infrastructure</h3>
           <p class="slide__desc">
@@ -228,8 +232,12 @@
       </article>
 
       <article class="slide" data-accent="1">
-        <div class="slide__num">02</div>
+        <div class="slide__stage">
+          <canvas class="stage__canvas" data-viz="traffic" aria-hidden="true"></canvas>
+          <span class="stage__caption eyebrow">Learned policy running against a fixed-time baseline</span>
+        </div>
         <div class="slide__body">
+          <span class="slide__num" aria-hidden="true">02</span>
           <span class="eyebrow slide__key">RL — Jan 2026 → Present</span>
           <h3 class="slide__title">Adaptive Traffic Signal Control</h3>
           <p class="slide__desc">
@@ -250,8 +258,22 @@
       </article>
 
       <article class="slide" data-accent="2">
-        <div class="slide__num">03</div>
+        <div class="slide__stage">
+          <div class="med" data-viz="medvigil" aria-hidden="true">
+            <span class="med__label eyebrow">Patient language</span>
+            <p class="med__input"><span data-med-input></span><i class="med__caret" data-med-caret></i></p>
+            <span class="med__label eyebrow">Structured context</span>
+            <div class="med__rows">
+              <div class="med__row" data-med-row><i data-med-key></i><b data-med-val></b></div>
+              <div class="med__row" data-med-row><i data-med-key></i><b data-med-val></b></div>
+              <div class="med__row" data-med-row><i data-med-key></i><b data-med-val></b></div>
+              <div class="med__row" data-med-row><i data-med-key></i><b data-med-val></b></div>
+            </div>
+          </div>
+          <span class="stage__caption eyebrow">Illustrative example — not a real record</span>
+        </div>
         <div class="slide__body">
+          <span class="slide__num" aria-hidden="true">03</span>
           <span class="eyebrow slide__key">MH — Applied AI</span>
           <h3 class="slide__title">MedVigil — AI Health Assistant</h3>
           <p class="slide__desc">
@@ -270,8 +292,12 @@
       </article>
 
       <article class="slide" data-accent="3">
-        <div class="slide__num">04</div>
+        <div class="slide__stage">
+          <canvas class="stage__canvas" data-viz="face" aria-hidden="true"></canvas>
+          <span class="stage__caption eyebrow">Landmark mesh driven by the classifier weights</span>
+        </div>
         <div class="slide__body">
+          <span class="slide__num" aria-hidden="true">04</span>
           <span class="eyebrow slide__key">ER — Computer vision</span>
           <h3 class="slide__title">Facial Emotion Recognition</h3>
           <p class="slide__desc">
@@ -455,5 +481,6 @@
 <div class="cursor" id="cursor" aria-hidden="true"><span class="cursor__dot"></span><span class="cursor__ring"></span></div>
 
 <script src="main.js"></script>
+<script src="visuals.js"></script>
 </body>
 </html>

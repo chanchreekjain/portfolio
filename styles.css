@@ -123,6 +123,11 @@ body::after{
 }
 
 .section__head{ margin-bottom:clamp(46px,7vh,86px); }
+.section__head > .eyebrow:first-child{ display:flex; align-items:center; gap:12px; }
+.section__head > .eyebrow:first-child::before{
+  content:""; width:38px; height:1px; flex:0 0 auto;
+  background:var(--spectrum);
+}
 
 .section__title{
   font-family:var(--display);
@@ -564,11 +569,17 @@ body::after{
 }
 .cap:hover{ background:rgba(237,234,228,.022); }
 .cap:hover::before{ transform:scaleX(1); }
+.cap:nth-child(1){ --acc:var(--sp-5); }
+.cap:nth-child(2){ --acc:var(--sp-3); }
+.cap:nth-child(3){ --acc:var(--sp-4); }
+.cap:nth-child(4){ --acc:var(--sp-2); }
+.cap::before{ background:var(--acc); }
+
 .cap__key{
   display:inline-block;
   font-size:10px; letter-spacing:.24em;
-  color:var(--champagne);
-  border:1px solid rgba(203,179,146,.28);
+  color:var(--acc,var(--champagne));
+  border:1px solid currentColor;
   border-radius:2px;
   padding:3px 8px 2px;
   margin-bottom:20px;
@@ -619,7 +630,12 @@ body::after{
   white-space:nowrap;
   transition:color .5s var(--ease);
 }
-.marquee__track i{ font-style:normal; font-size:11px; color:var(--champagne-d); opacity:.6; }
+.marquee__track i{ font-style:normal; font-size:11px; opacity:.75; color:var(--sp-3); }
+.marquee__track i:nth-of-type(5n+1){ color:var(--sp-1); }
+.marquee__track i:nth-of-type(5n+2){ color:var(--sp-3); }
+.marquee__track i:nth-of-type(5n+3){ color:var(--sp-4); }
+.marquee__track i:nth-of-type(5n+4){ color:var(--sp-5); }
+.marquee__track i:nth-of-type(5n+5){ color:var(--sp-7); }
 .marquee:hover .marquee__track span{ color:var(--paper-80); }
 @keyframes slide{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
 
@@ -627,7 +643,7 @@ body::after{
    Systems — horizontal gallery
    ═══════════════════════════════════════════════════════════════ */
 
-.gallery{ position:relative; height:420vh; border-top:1px solid var(--line); }
+.gallery{ position:relative; height:520vh; border-top:1px solid var(--line); }
 .gallery__sticky{
   position:sticky; top:0;
   height:100svh;
@@ -670,25 +686,90 @@ body::after{
   align-self:stretch;
   overflow-y:auto;
   overscroll-behavior:contain;
-  width:min(74vw,900px);
+  width:min(88vw,1240px);
   margin-right:clamp(18px,2.4vw,40px);
-  padding:clamp(26px,3.2vw,50px);
+  padding:clamp(22px,2.6vw,38px);
   border:1px solid var(--line-2);
   border-radius:12px;
   background:linear-gradient(165deg, var(--ink-3), var(--ink-2) 70%);
-  display:flex; align-items:flex-start; gap:clamp(20px,3vw,46px);
+  display:grid;
+  grid-template-columns:minmax(0,1.02fr) minmax(0,1fr);
+  align-items:stretch;
+  gap:clamp(20px,2.6vw,40px);
+}
+.slide[data-accent="0"]{ --acc:var(--sp-5); }
+.slide[data-accent="1"]{ --acc:var(--sp-3); }
+.slide[data-accent="2"]{ --acc:var(--sp-7); }
+.slide[data-accent="3"]{ --acc:var(--sp-2); }
+
+/* ── live visual stage ── */
+.slide__stage{
+  position:relative;
+  display:flex; flex-direction:column; gap:10px;
+  min-height:230px;
+}
+.stage__canvas,.med{
+  flex:1 1 auto;
+  min-height:0;
+  width:100%;
+  display:block;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:#0A0A0E;
+}
+.stage__canvas{ height:100%; }
+.slide__stage::before{
+  content:"";
+  position:absolute; left:0; right:0; top:0; height:1px;
+  background:linear-gradient(90deg, var(--acc), transparent 80%);
+  opacity:.9; z-index:2; border-radius:8px 8px 0 0;
+}
+.stage__caption{ flex:0 0 auto; font-size:9px; letter-spacing:.22em; }
+
+/* ── MedVigil extraction widget ── */
+.med{
+  padding:clamp(16px,1.6vw,24px);
+  display:flex; flex-direction:column; gap:9px;
   overflow:hidden;
 }
+.med__label{ font-size:8.5px; letter-spacing:.26em; color:var(--paper-38); }
+.med__input{
+  font-size:clamp(12px,1.05vw,14.5px);
+  line-height:1.6;
+  color:var(--paper-80);
+  min-height:3.2em;
+  margin-bottom:4px;
+}
+.med__caret{
+  display:inline-block; width:7px; height:1em; margin-left:2px;
+  background:var(--sp-7); vertical-align:-2px;
+  animation:blink 1s steps(2,end) infinite;
+}
+@keyframes blink{ 50%{opacity:0;} }
+.med__rows{ flex:1 1 auto; min-height:0; display:flex; flex-direction:column; gap:1px; background:var(--line); border:1px solid var(--line); }
+.med__row{
+  flex:1 1 0;
+  display:flex; align-items:center; gap:12px;
+  padding:8px 12px;
+  background:#0A0A0E;
+  min-height:2.35em;
+  opacity:.28;
+  transform:translateX(-6px);
+  transition:opacity .5s var(--ease-out), transform .6s var(--ease-out), background .5s var(--ease);
+}
+.med__row.is-on{ opacity:1; transform:none; background:#101017; }
+.med__row i{
+  font-style:normal; flex:0 0 92px;
+  font-size:8.5px; letter-spacing:.2em; text-transform:uppercase; color:var(--sp-7);
+}
+.med__row b{ font-weight:400; font-family:var(--display); font-size:clamp(12px,1.1vw,15px); color:var(--paper); }
 .slide:first-child{ margin-left:var(--pad); }
 .slide:last-child{ margin-right:var(--pad); }
 .slide::before{
   content:""; position:absolute; top:0; left:0; right:0; height:1px;
-  opacity:.75;
+  background:linear-gradient(90deg,var(--acc),transparent 72%);
+  opacity:.8;
 }
-.slide[data-accent="0"]::before{ background:linear-gradient(90deg,var(--sp-1),transparent 70%); }
-.slide[data-accent="1"]::before{ background:linear-gradient(90deg,var(--sp-3),transparent 70%); }
-.slide[data-accent="2"]::before{ background:linear-gradient(90deg,var(--sp-4),transparent 70%); }
-.slide[data-accent="3"]::before{ background:linear-gradient(90deg,var(--sp-5),transparent 70%); }
 .slide::after{
   content:""; position:absolute; right:-18%; bottom:-40%;
   width:52%; aspect-ratio:1; border-radius:50%;
@@ -701,15 +782,22 @@ body::after{
 .slide{ scrollbar-width:thin; scrollbar-color:var(--line-2) transparent; }
 
 .slide__num{
+  position:absolute; top:-4px; right:0;
   font-family:var(--display);
-  font-size:clamp(40px,6vw,104px);
+  font-size:clamp(38px,4.6vw,74px);
   line-height:.85;
   color:transparent;
-  -webkit-text-stroke:1px rgba(237,234,228,.20);
-  flex:0 0 auto;
+  -webkit-text-stroke:1px var(--acc);
+  opacity:.5;
+  pointer-events:none;
 }
-.slide__body{ position:relative; z-index:2; max-width:64ch; }
-.slide__key{ margin-bottom:16px; color:var(--champagne-d); }
+.slide__body{
+  position:relative; z-index:2;
+  display:flex; flex-direction:column;
+  padding-right:clamp(40px,5vw,78px);
+}
+.slide__desc{ flex:1 1 auto; }
+.slide__key{ margin-bottom:14px; color:var(--acc); }
 .slide__title{
   font-family:var(--display);
   font-weight:400;
@@ -791,10 +879,14 @@ body::after{
 }
 .entry:first-child{ border-top:1px solid var(--line); }
 .entry__meta{ display:flex; flex-direction:column; gap:9px; }
+.entry:nth-child(2) .entry__key{ color:var(--sp-3); }
+.entry:nth-child(3) .entry__key{ color:var(--sp-4); }
+.entry:nth-child(4) .entry__key{ color:var(--sp-5); }
+.entry:nth-child(5) .entry__key{ color:var(--sp-7); }
 .entry__key{
   font-size:10px; letter-spacing:.22em;
   color:var(--champagne);
-  border:1px solid rgba(203,179,146,.28);
+  border:1px solid currentColor;
   border-radius:2px;
   padding:3px 8px 2px;
   align-self:flex-start;
@@ -1027,10 +1119,13 @@ body::after{
   .slide{
     width:100%;
     margin:0 !important;
-    flex-direction:column;
-    gap:16px;
+    grid-template-columns:1fr;
+    gap:18px;
   }
-  .slide__num{ font-size:34px; }
+  .slide__stage{ min-height:0; }
+  .stage__canvas,.med{ aspect-ratio:16 / 11; height:auto; }
+  .slide__body{ padding-right:56px; }
+  .slide__num{ font-size:38px; }
 
   .expand{ height:220vh; }
   .hero__foot{ flex-direction:column; align-items:flex-start; gap:22px; }
@@ -1060,7 +1155,9 @@ body::after{
   .gallery{ height:auto; }
   .gallery__sticky{ position:static; height:auto; }
   .gallery__track{ flex-direction:column; transform:none !important; padding:0 var(--pad) 80px; gap:18px; }
-  .slide{ width:100%; margin:0 !important; flex-direction:column; }
+  .slide{ width:100%; margin:0 !important; grid-template-columns:1fr; }
+  .stage__canvas,.med{ aspect-ratio:16 / 11; height:auto; }
+  .med__caret{ animation:none; }
   .expand{ height:auto; }
   .expand__sticky{ position:static; height:auto; padding:120px 0; }
   .expand__panel{ width:100% !important; height:auto !important; padding:clamp(30px,6vw,70px) 0; border-radius:0; border-left:0; border-right:0; }
