@@ -1,29 +1,22 @@
 # Company logos
 
-Drop the official logo files in here and they appear automatically — the page
-looks for each file on load, and falls back to a typographic wordmark when the
-file is missing. Nothing breaks either way.
+Four marks live here, supplied by Chanchreek and processed for the wall:
+backgrounds removed, edges kept anti-aliased, cropped to the mark, and scaled
+to 180px tall — plenty for the 38px slot on a 3x screen.
 
-Expected filenames (SVG preferred, PNG with transparency also fine):
+    oracle.png
+    ibm.png
+    springer.png
+    upes.png
 
-    oracle.svg
-    ibm.svg
-    springer.svg
-    upes.svg
-    bbvk.svg
+Badhit Bal Vikas Kendra has no mark, so that cell shows a typographic wordmark
+instead. Nothing is missing and nothing needs adding — the wall checks for each
+file on load and falls back to type when one isn't there.
 
-Get them from each company's own brand/press page rather than an image search —
-those pages give you the correct file and the usage terms:
+The files keep their original colours, but the wall flattens every mark to the
+page's own ink so the row reads as one set and follows the light/dark flip.
+To show them in full colour instead, drop the `filter` off `.wall__logo`
+in styles.css.
 
-  Oracle    oracle.com/corporate/brand
-  IBM       ibm.com/brand
-  Springer  springernature.com  (press / media resources)
-  UPES      upes.ac.in          (media kit)
-
-The wall renders every logo in a single flat colour that follows the page
-theme, so a solid one-colour SVG works best. A full-colour file still works —
-it just won't recolour with the ground.
-
-Using a former employer's logo to state factually where you worked is normal on
-a CV or portfolio. Keep the logo unmodified, don't imply the company endorses
-you or the site, and you're on solid ground.
+To swap a mark, replace the file and keep the name. To add one, add a
+`.wall__cell` in index.html and drop `<name>.png` in here.
