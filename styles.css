@@ -1044,6 +1044,26 @@ html.is-bone .cred__logo{ filter:grayscale(1) brightness(0); }
 }
 .cred--cert:hover .cred__go::after{ width:40px; }
 
+/* course certificates — a list, not four more plates. Each row is
+   its own link, sized for a thumb. */
+.cred__courses{
+  list-style:none; margin:0; padding:0;
+  border-top:1px solid var(--line);
+}
+.cred__courses li{ border-bottom:1px solid var(--line); }
+.cred__courses a{
+  display:flex; align-items:center; justify-content:space-between; gap:14px;
+  min-height:48px; padding:6px 0;
+  font-size:15px; color:var(--paper-80); text-decoration:none;
+  transition:color .4s var(--ease), padding .5s var(--ease-out);
+}
+.cred__courses a::after{
+  content:"View"; flex:0 0 auto;
+  font-size:10px; letter-spacing:.24em; text-transform:uppercase;
+  color:var(--champagne);
+}
+.cred__courses a:hover{ color:var(--paper); padding-left:6px; }
+
 /* ═══════════════════════════════════════════════════════════════
    Contact
    ═══════════════════════════════════════════════════════════════ */
